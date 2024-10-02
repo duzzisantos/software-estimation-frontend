@@ -1,0 +1,12 @@
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import url("https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Poppins&display=swap");
+
+* {
+  font-family: sans-serif;
+}
+.App {
+  height: fit-content;
+  width: 2000px;
+  color: white !important;
+  background-color: green !important;
+}

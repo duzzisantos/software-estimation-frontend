@@ -48,13 +48,15 @@ const TimeSeriesAnalysis = ({
 
   return (
     <Col className="my-4 p-4">
-      <h2 className="h5 mx-2 fw-normal">Select tasks for PERT Analysis</h2>
+      <h2 className="h5 mx-2 fw-normal">
+        Select tasks for Time Series Analysis
+      </h2>
 
       <div className="d-flex flex-fill hstack gap-2 flex-md-wrap flex-sm-wrap p-2">
         {tasks.map((task) => (
           <Form.Group
             key={task}
-            className="bg-primary-subtle text-dark fw-light rounded-3 hstack gap-2 p-2"
+            className="bg-info-subtle fw-light rounded-3 hstack gap-2 p-2"
           >
             <Form.Label className="text-capitalize">
               {task.split("_").join(" ")}
@@ -74,9 +76,9 @@ const TimeSeriesAnalysis = ({
           className="py-3 px-2 bg-light fw-light border-start border-5 border-primary"
         >
           Note: For every selected task, you are to provide an estimated time in
-          decimal format. Example:{" "}
+          non-decimal format. Example:{" "}
           <em>
-            <strong>Styling Task - 120.0 minutes</strong>
+            <strong>Data Backup Task - 100 minutes</strong>
           </em>
         </Col>
         <div className="d-flex flex-wrap gap-2">

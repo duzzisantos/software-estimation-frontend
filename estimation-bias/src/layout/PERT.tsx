@@ -1,7 +1,11 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState, useEffect } from "react";
+
 import { TaskInput } from "../forms/FormFactory";
-import { Button, Col, Form } from "react-bootstrap";
+import { Alert, Badge, Button, Col, Form, Tab, Tabs } from "react-bootstrap";
 import { tasks } from "../utils/data";
+import fetchPertData from "../utils/fetchPertData";
+import MonteCarloSimulation from "../graphs/MonteCarloSimulation";
+import MonteCarloTable from "../tables/MonteCarloTable";
 
 // Define a strict Task type
 interface Task {
@@ -14,7 +18,56 @@ interface FormSelection {
   setSelectedTasks: Dispatch<SetStateAction<Task[]>>;
 }
 
+export interface Results {
+  simulated_operations: number[];
+  predictions: {
+    mean_duration: number;
+    st_deviation: number;
+    ninetieth_percentile: number;
+  };
+  pessimistic_estimation: number;
+  most_likely_estimation: number;
+  optimistic_estimation: number;
+}
+
 const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
+  const [optimistic, setOptimistic] = useState(0.0);
+  const [pessimistic, setPessimistic] = useState(0.0);
+  const [results, setResults] = useState<Results>();
+
+  const [data, setData] = useState([]);
+  const [options, setOptions] = useState({
+    title: { text: "PERT Analysis using Monte Carlo Simulations" },
+    series: [{ type: "bar", xKey: "Simulation", yKey: "Score" }],
+  });
+
+  useEffect(() => {
+    const generateDataSet = () => {
+      const output: { Simulation: number; Score: number }[] = [];
+      if (results?.simulated_operations === undefined) {
+        return output;
+      } else if (results?.simulated_operations !== undefined) {
+        for (let i = 0; i < results?.simulated_operations.length; i++) {
+          output.push({
+            Simulation: i + 1,
+            Score: results?.simulated_operations[i],
+          });
+        }
+        return output;
+      }
+      // return output;
+    };
+    // Once data is generated, update the options
+    const d = generateDataSet();
+    setData(d);
+
+    // Update the chart options when data is ready
+    setOptions((prevOptions) => ({
+      ...prevOptions,
+      data: d, // Set the updated data
+    }));
+  }, [results]); // Re-run when 'results' changes
+
   // Handle task selection, adding/removing task objects
   const handleSelectedTasks = (newTaskName: string) => {
     setSelectedTasks((prevTasks) => {
@@ -43,9 +96,33 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
     );
   };
 
+  const totalMostLikelyTime = selectedTasks
+    .map((element: Task) => element.timeEstimate)
+    .reduce((acc, curr) => curr + acc, 0);
+
+  //Prepare API request body in post object containing required fields that will run the Monte Carlo Simulation
+  const postObject = {
+    optimistic,
+    most_likely: totalMostLikelyTime,
+    pessimistic,
+  };
+
+  const handleQueryPertAnalysis = async () => {
+    try {
+      const res = await fetchPertData(postObject);
+      return setResults(res);
+    } catch (err) {
+      return console.log(err);
+    }
+  };
+
+  console.log(results);
+
   return (
     <Col className="my-4 p-4">
-      <h2 className="h5 mx-2 fw-normal">Select tasks for PERT Analysis</h2>
+      <h2 className="h5 mx-2 fw-normal">
+        Select tasks for PERT Analysis run by Monte Carlo Simulation
+      </h2>
 
       <div className="d-flex flex-fill hstack gap-2 flex-md-wrap flex-sm-wrap p-2">
         {tasks.map((task) => (
@@ -73,8 +150,12 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
           Note: For every selected task, you are to provide an estimated time in
           decimal format. Example:{" "}
           <em>
-            <strong>Styling Task - 120.0 minutes</strong>
-          </em>
+            <strong>Styling Task - 120.0 minutes.</strong>
+          </em>{" "}
+          Pessimistic time must be greater than optimistic and most likely time.
+          The goal is to gather data for optimistic, most likely (which is a sum
+          of all the estimates you will provide per selected task), and finally
+          the pessimistic estimates.
         </Col>
         <div className="d-flex flex-wrap gap-2">
           {selectedTasks.map((task, index) => (
@@ -88,15 +169,85 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
             />
           ))}
         </div>
+        {selectedTasks.length > 0 && (
+          <Col className="bg-secondary-subtle p-3 d-flex flex-column gap-3 fw-normal">
+            <div className="hstack gap-5">
+              <Form.Group>
+                <Form.Label>
+                  Optimistic Time{" "}
+                  <small className="text-danger">* required</small>
+                </Form.Label>
+                <Form.Control
+                  required
+                  type="number"
+                  placeholder="Enter optmistic time"
+                  value={optimistic}
+                  onChange={(e) => setOptimistic(parseFloat(e.target.value))}
+                />
+              </Form.Group>
+              <Form.Group>
+                <Form.Label>
+                  Pessimistic Time{" "}
+                  <small className="text-danger">* required</small>
+                </Form.Label>
+                <Form.Control
+                  required
+                  type="number"
+                  placeholder="Enter pessimistic time"
+                  value={pessimistic}
+                  onChange={(e) => setPessimistic(parseFloat(e.target.value))}
+                />
+              </Form.Group>
+            </div>
+            <div className="hstack gap-5">
+              <output>
+                Optimistic Estimation:{" "}
+                <Badge bg="success" pill>
+                  {optimistic}
+                </Badge>
+              </output>
+              <output>
+                Most Likely Estimation:{" "}
+                <Badge bg="info" className="text-dark" pill>
+                  {totalMostLikelyTime}
+                </Badge>
+              </output>
+              <output>
+                Pessimistic Estimation:{" "}
+                <Badge bg="danger" pill>
+                  {pessimistic}
+                </Badge>
+              </output>
+            </div>
+          </Col>
+        )}
         {selectedTasks.length > 0 ? (
           <div className="mw-100 gap-2 hstack ">
-            <Button size="sm">Submit Tasks</Button>
-            <Button size="sm" variant="secondary">
-              Clear Form
+            <Button size="sm" onClick={handleQueryPertAnalysis}>
+              Submit Tasks
             </Button>
           </div>
         ) : null}
       </Form>
+
+      <Col className="my-5">
+        <h2 className="h5 fw-normal">Estimation Analysis Result</h2>
+        <Tabs defaultActiveKey={"table"} variant="underline">
+          <Tab eventKey={"chart"} title="Result Chart">
+            {" "}
+            <MonteCarloSimulation options={options} />
+          </Tab>
+          <Tab eventKey={"table"} title="Result Table">
+            {results !== undefined ? (
+              <MonteCarloTable result={results} />
+            ) : (
+              <Alert variant="info" className="border-0 mt-3 fw-normal">
+                No results to show yet
+              </Alert>
+            )}
+          </Tab>
+        </Tabs>
+      </Col>
     </Col>
   );
 };

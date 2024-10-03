@@ -7,7 +7,7 @@ function useChartOptions(year: string) {
       // },
       title: {
         display: true,
-        text: ` Predicted durations for 29 tasks per period - trained by Tensorflow and Scikit Learn ${year} `,
+        text: ` Predictions for 29 tasks per period ${year} `,
       },
     },
   };

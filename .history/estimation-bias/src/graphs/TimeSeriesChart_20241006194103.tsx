@@ -39,9 +39,11 @@ interface DataSets {
 // }
 
 const TimeSeriesChart = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [period, selectedPeriod] = useState("");
   const [reponseData, setResponseData] = useState([]);
   const { length } = reponseData;
-  const options = useChartOptions("", length);
+  const options = useChartOptions(period, length);
 
   useEffect(() => {
     async function storeDataTraining() {

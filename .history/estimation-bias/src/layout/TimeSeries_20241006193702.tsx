@@ -172,10 +172,7 @@ const TimeSeriesAnalysis = ({
 
       <Col className="p-4 rounded-2 shadow-lg fw-normal">
         <h2 className="h5">Estimation Result Analysis</h2>
-        <p>
-          Select specific periods or nearest dates to see trained estimated
-          times for completing project tasks
-        </p>
+
         <TimeSeriesChart />
       </Col>
     </Col>

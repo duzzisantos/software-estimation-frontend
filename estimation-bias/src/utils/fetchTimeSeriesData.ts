@@ -33,21 +33,17 @@ interface TaskProperties {
 }
 
 const url: string = import.meta.env.VITE_API_URL_CRUD;
-const isProd: boolean = import.meta.env.PROD;
 
 async function createWorkLogs(postObject: TaskProperties) {
   try {
-    const response = await fetch(
-      isProd ? `${url}/CreateWorkLog` : "http://localhost:4000/CreateWorkLog",
-      {
-        method: "POST",
-        body: JSON.stringify(postObject),
-        headers: {
-          "Content-Type": "application/json",
-          Allow: "POST",
-        },
-      }
-    );
+    const response = await fetch(`${url}/CreateWorkLog`, {
+      method: "POST",
+      body: JSON.stringify(postObject),
+      headers: {
+        "Content-Type": "application/json",
+        Allow: "POST",
+      },
+    });
 
     if (!response.ok || response.status !== 200) {
       throw new Error(`${response.status}, Cause: ${response.type}`);

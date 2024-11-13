@@ -68,7 +68,6 @@ const TimeSeriesAnalysis = ({
     return obj;
   };
 
-  console.log(postObject());
   const handleSubmitTasks = async () => {
     try {
       const res = await createWorkLogs(postObject());

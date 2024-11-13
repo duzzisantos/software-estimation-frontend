@@ -42,20 +42,18 @@ const TimeSeriesChart = () => {
   const [reponseData, setResponseData] = useState([]);
   const { length } = reponseData;
   const options = useChartOptions("", length);
+  const url = import.meta.env.VITE_API_URL_TRAINING;
 
   useEffect(() => {
     async function storeDataTraining() {
       try {
-        const response = await fetch(
-          "http://localhost:8000/GetTrainedWorkLogs",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Allow: "GET",
-            },
-          }
-        );
+        const response = await fetch(`${url}/GetTrainedWorkLogs`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Allow: "GET",
+          },
+        });
 
         if (!response.ok || response.status !== 200) {
           throw new Error(`${response.status}, Cause: ${response.type}`);
@@ -69,7 +67,7 @@ const TimeSeriesChart = () => {
     }
 
     storeDataTraining();
-  }, []);
+  }, [url]);
 
   const generateData = () => {
     const result: DataSets[] = [];

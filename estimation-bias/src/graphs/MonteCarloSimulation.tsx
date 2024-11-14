@@ -4,19 +4,15 @@ export interface Data {
   Simulation: number;
   Score: number;
 }
-
-interface Series {
-  type: string;
-  xKey: string;
-  yKey: string;
-}
-export interface ChartOptions {
+interface ChartOptions {
   data: Data[];
   title: { text: string };
-  series: Series[];
+  series: [];
 }
-
-const MonteCarloSimulation = ({ options }: { options: ChartOptions }) => {
+interface Props {
+  options: ChartOptions;
+}
+const MonteCarloSimulation = ({ options }: Props) => {
   return <AgCharts options={options} style={{ height: "650px" }} />;
 };
 

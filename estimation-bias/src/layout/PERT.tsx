@@ -4,7 +4,10 @@ import { TaskInput } from "../forms/FormFactory";
 import { Alert, Badge, Button, Col, Form, Tab, Tabs } from "react-bootstrap";
 import { tasks } from "../utils/data";
 import fetchPertData from "../utils/fetchPertData";
-import MonteCarloSimulation from "../graphs/MonteCarloSimulation";
+import MonteCarloSimulation, {
+  ChartOptions,
+  Data,
+} from "../graphs/MonteCarloSimulation";
 import MonteCarloTable from "../tables/MonteCarloTable";
 
 // Define a strict Task type
@@ -35,8 +38,9 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
   const [pessimistic, setPessimistic] = useState(0.0);
   const [results, setResults] = useState<Results>();
 
-  const [data, setData] = useState([]);
-  const [options, setOptions] = useState({
+  const [data, setData] = useState<Data[]>([]);
+  const [options, setOptions] = useState<ChartOptions>({
+    data: data,
     title: { text: "PERT Analysis using Monte Carlo Simulations" },
     series: [{ type: "bar", xKey: "Simulation", yKey: "Score" }],
   });
@@ -59,13 +63,15 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
     };
     // Once data is generated, update the options
     const d = generateDataSet();
-    setData(d);
+    setData(d ?? []);
 
     // Update the chart options when data is ready
-    setOptions((prevOptions) => ({
-      ...prevOptions,
-      data: d, // Set the updated data
-    }));
+    setOptions(
+      (prevOptions: ChartOptions): ChartOptions => ({
+        ...prevOptions,
+        data: d ?? [], // Set the updated data
+      })
+    );
   }, [results]); // Re-run when 'results' changes
 
   // Handle task selection, adding/removing task objects

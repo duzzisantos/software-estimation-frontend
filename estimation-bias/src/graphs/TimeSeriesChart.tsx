@@ -32,14 +32,15 @@ interface DataSets {
   backgroundColor: string[];
 }
 
-// interface ResponseData {
-//   training_date: string;
-//   task_categories: string[];
-//   predicted_durations: number[];
-// }
+interface ResponseData {
+  training_date: string;
+  task_categories: string[];
+  predicted_durations: number[];
+}
 
 const TimeSeriesChart = () => {
-  const [reponseData, setResponseData] = useState([]);
+  const [reponseData, setResponseData] = useState<ResponseData[]>([]);
+
   const { length } = reponseData;
   const options = useChartOptions("", length);
   const url = import.meta.env.VITE_API_URL_TRAINING;
@@ -98,8 +99,6 @@ const TimeSeriesChart = () => {
       datasets: result,
     };
   };
-
-  console.log(generateData());
 
   return <Line options={options} data={generateData()} />;
 };

@@ -1,17 +1,22 @@
 import { AgCharts } from "ag-charts-react";
 
-interface Data {
+export interface Data {
   Simulation: number;
   Score: number;
 }
-interface ChartOptions {
+
+interface Series {
+  type: string;
+  xKey: string;
+  yKey: string;
+}
+export interface ChartOptions {
   data: Data[];
   title: { text: string };
+  series: Series[];
 }
-interface Props {
-  options: ChartOptions;
-}
-const MonteCarloSimulation = ({ options }: Props) => {
+
+const MonteCarloSimulation = ({ options }: { options: ChartOptions }) => {
   return <AgCharts options={options} style={{ height: "650px" }} />;
 };
 

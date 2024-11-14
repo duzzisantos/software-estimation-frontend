@@ -16,6 +16,13 @@ interface Task {
   timeEstimate: number;
 }
 
+// Define the type for `obj`
+interface PostObject {
+  [taskName: string]: number | string; // Dynamic keys based on `taskName`, with values of either `number` or `string`
+  last_updated: string;
+  submitted_by: string;
+}
+
 interface FormSelection {
   selectedNewTasks: Task[];
   setSelectedNewTasks: Dispatch<SetStateAction<Task[]>>;
@@ -54,7 +61,10 @@ const TimeSeriesAnalysis = ({
   };
 
   const postObject = () => {
-    const obj: any = {};
+    const obj: PostObject = {
+      last_updated: formatDate(),
+      submitted_by: "Harry West",
+    };
 
     for (let i = 0; i < selectedNewTasks.length; i++) {
       const [key, value] = [
@@ -63,8 +73,7 @@ const TimeSeriesAnalysis = ({
       ];
       obj[key] = value;
     }
-    obj["last_updated"] = formatDate();
-    obj["submitted_by"] = "Harry West";
+
     return obj;
   };
 

@@ -125,7 +125,7 @@ const TimeSeriesAnalysis = ({
 
       <h2 className="h5 fw-normal">Select tasks for Time Series Analysis</h2>
 
-      <div className="d-flex flex-fill hstack gap-2 flex-md-wrap flex-sm-wrap p-4 rounded-2 shadow-lg">
+      <div className="d-flex flex-fill form-generate hstack gap-2 flex-md-wrap flex-sm-wrap p-4 rounded-2 shadow-lg">
         {tasks.map((task) => (
           <Form.Group
             key={task}

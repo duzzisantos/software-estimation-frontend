@@ -126,11 +126,11 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
         Select tasks for PERT Analysis run by Monte Carlo Simulation
       </h2>
 
-      <div className="d-flex flex-fill hstack gap-2 rounded-3 shadow-lg flex-md-wrap flex-sm-wrap p-3 py-5">
+      <div className="d-flex flex-fill form-generate hstack gap-2 rounded-3 shadow-lg flex-md-wrap flex-sm-wrap p-3 py-5">
         {tasks.map((task) => (
           <Form.Group
             key={task}
-            className="bg-primary-subtle text-dark fw-light rounded-3 hstack gap-2 p-2"
+            className=" bg-primary-subtle text-dark fw-light rounded-3 hstack gap-2 p-2"
           >
             <Form.Label className="text-capitalize">
               {task.split("_").join(" ")}

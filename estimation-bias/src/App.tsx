@@ -15,14 +15,15 @@ function App() {
 
   return (
     <Container fluid className="flex-grow-0 flex-shrink-1 text-dark vh-100 App">
-      <img
-        style={{ marginLeft: "-8px" }}
-        height={130}
-        width={180}
-        src={logo2}
-        alt="Software Project Estimator"
-      />{" "}
-      <Row>
+      <header className="page-header shadow-lg">
+        <img
+          height={90}
+          width={140}
+          src={logo2}
+          alt="Software Project Estimator"
+        />{" "}
+      </header>
+      <Row className="mt-5">
         <Col>
           <h1 className="h5 fw-bold mx-3">Software Project Estimator</h1>
           <Tabs defaultActiveKey={"pert"} variant="underline" className="p-3">

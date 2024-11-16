@@ -9,3 +9,14 @@
   width: 100%;
   color: white !important;
 }
+
+.page-header {
+  height: 90px;
+  width: 100%;
+}
+
+@media screen and (max-width: 600px) {
+  .form-generate {
+    flex-wrap: wrap !important;
+  }
+}

@@ -105,11 +105,11 @@ const TimeSeriesAnalysis = ({
   };
 
   return (
-    <Col className="my-4 p-4">
+    <Col className="my-3 p-3">
       <Button
         variant="primary"
         size="sm"
-        className="my-3 mx-2"
+        className="my-3"
         onClick={handleRetrainData}
       >
         Retrain Data
@@ -123,9 +123,7 @@ const TimeSeriesAnalysis = ({
         Update Trained Data
       </Button>
 
-      <h2 className="h5 mx-2 fw-normal">
-        Select tasks for Time Series Analysis
-      </h2>
+      <h2 className="h5 fw-normal">Select tasks for Time Series Analysis</h2>
 
       <div className="d-flex flex-fill hstack gap-2 flex-md-wrap flex-sm-wrap p-4 rounded-2 shadow-lg">
         {tasks.map((task) => (

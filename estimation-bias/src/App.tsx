@@ -3,6 +3,7 @@ import "./App.css";
 import { Container, Row, Col, Tab, Tabs } from "react-bootstrap";
 import PERTAnalysis from "./layout/PERT";
 import TimeSeriesAnalysis from "./layout/TimeSeries";
+import logo2 from "./assets/SPE 2.jpeg";
 
 interface Task {
   taskName: string;
@@ -14,10 +15,17 @@ function App() {
 
   return (
     <Container fluid className="flex-grow-0 flex-shrink-1 text-dark vh-100 App">
-      <h1 className="my-4 h2 fw-bold">Software Task Estimation</h1>
+      <img
+        style={{ marginLeft: "-8px" }}
+        height={130}
+        width={180}
+        src={logo2}
+        alt="Software Project Estimator"
+      />{" "}
       <Row>
         <Col>
-          <Tabs defaultActiveKey={"pert"} variant="underline">
+          <h1 className="h5 fw-bold mx-3">Software Project Estimator</h1>
+          <Tabs defaultActiveKey={"pert"} variant="underline" className="p-3">
             <Tab eventKey={"pert"} title="PERT" className="fw-bold">
               <PERTAnalysis
                 selectedTasks={selectedTasks}

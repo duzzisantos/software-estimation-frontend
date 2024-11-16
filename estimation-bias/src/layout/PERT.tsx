@@ -68,7 +68,9 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
       ...prevOptions,
       data: data, // Set the updated data
     }));
-  }, [results, data]); // Re-run when 'results' changes
+
+    //eslint-disable-next-line
+  }, [results]);
 
   // Handle task selection, adding/removing task objects
   const handleSelectedTasks = (newTaskName: string) => {
@@ -120,7 +122,7 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
 
   return (
     <Col className="my-4 p-3">
-      <h2 className="h5 mx-2 fw-normal">
+      <h2 className="h5 fw-normal">
         Select tasks for PERT Analysis run by Monte Carlo Simulation
       </h2>
 

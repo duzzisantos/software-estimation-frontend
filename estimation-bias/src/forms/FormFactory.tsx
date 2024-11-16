@@ -14,6 +14,7 @@ export const TaskInput = ({ taskName, taskValue, setTaskValue }: TaskProps) => {
         type="number"
         value={taskValue}
         onChange={(e) => setTaskValue(parseFloat(e.target.value))}
+        min={0}
       />
     </Form.Group>
   );

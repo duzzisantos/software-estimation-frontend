@@ -14,7 +14,7 @@ function App() {
 
   return (
     <Container fluid className="flex-grow-0 flex-shrink-1 text-dark vh-100 App">
-      <h1 className="my-4 h2 fw-bold">SPE</h1>
+      <h1 className="my-4 h2 fw-bold">Software Task Estimation</h1>
       <Row>
         <Col>
           <Tabs defaultActiveKey={"pert"} variant="underline">

@@ -1,10 +1,11 @@
 import { Dispatch, SetStateAction, useState, useEffect } from "react";
-
+import { Data } from "../graphs/MonteCarloSimulation";
+import { AgCharts } from "ag-charts-react";
+import { AgChartOptions } from "ag-charts-community";
 import { TaskInput } from "../forms/FormFactory";
 import { Alert, Badge, Button, Col, Form, Tab, Tabs } from "react-bootstrap";
 import { tasks } from "../utils/data";
 import fetchPertData from "../utils/fetchPertData";
-import MonteCarloSimulation from "../graphs/MonteCarloSimulation";
 import MonteCarloTable from "../tables/MonteCarloTable";
 
 // Define a strict Task type
@@ -35,15 +36,16 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
   const [pessimistic, setPessimistic] = useState(0.0);
   const [results, setResults] = useState<Results>();
 
-  const [data, setData] = useState([]);
-  const [options, setOptions] = useState({
+  const [data, setData] = useState<Data[]>();
+  const [options, setOptions] = useState<AgChartOptions>({
+    data,
     title: { text: "PERT Analysis using Monte Carlo Simulations" },
     series: [{ type: "bar", xKey: "Simulation", yKey: "Score" }],
   });
 
   useEffect(() => {
     const generateDataSet = () => {
-      const output: { Simulation: number; Score: number }[] = [];
+      const output: Data[] = [];
       if (results?.simulated_operations === undefined) {
         return output;
       } else if (results?.simulated_operations !== undefined) {
@@ -58,15 +60,15 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
       // return output;
     };
     // Once data is generated, update the options
-    const d = generateDataSet();
-    setData(d);
+
+    setData(generateDataSet());
 
     // Update the chart options when data is ready
     setOptions((prevOptions) => ({
       ...prevOptions,
-      data: d, // Set the updated data
+      data: data, // Set the updated data
     }));
-  }, [results]); // Re-run when 'results' changes
+  }, [results, data]); // Re-run when 'results' changes
 
   // Handle task selection, adding/removing task objects
   const handleSelectedTasks = (newTaskName: string) => {
@@ -234,7 +236,7 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
         <Tabs defaultActiveKey={"table"} variant="underline">
           <Tab eventKey={"chart"} title="Result Chart">
             {" "}
-            <MonteCarloSimulation options={options} />
+            <AgCharts options={options} style={{ height: "650px" }} />
           </Tab>
           <Tab eventKey={"table"} title="Result Table">
             {results !== undefined ? (

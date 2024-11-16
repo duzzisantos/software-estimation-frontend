@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "ag-charts-community": "^10.3.3",
-    "ag-charts-react": "^10.2.0",
-    "ag-grid-react": "^32.2.1",
+    "ag-charts-react": "^10.3.3",
+    "ag-grid-react": "^32.3.3",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.4",
     "common.js": "^1.1.1",

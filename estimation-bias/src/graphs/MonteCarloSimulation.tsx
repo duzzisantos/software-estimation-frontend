@@ -7,7 +7,6 @@ export interface Data {
 interface ChartOptions {
   data: Data[];
   title: { text: string };
-  series: [];
 }
 interface Props {
   options: ChartOptions;

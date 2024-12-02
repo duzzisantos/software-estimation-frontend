@@ -3,10 +3,27 @@ import { Data } from "../graphs/MonteCarloSimulation";
 import { AgCharts } from "ag-charts-react";
 import { AgChartOptions } from "ag-charts-community";
 import { TaskInput } from "../forms/FormFactory";
-import { Alert, Badge, Button, Col, Form, Tab, Tabs } from "react-bootstrap";
+import {
+  Alert,
+  Badge,
+  Button,
+  Col,
+  Form,
+  Tab,
+  Tabs,
+  Spinner,
+} from "react-bootstrap";
 import { tasks } from "../utils/data";
 import fetchPertData from "../utils/fetchPertData";
 import MonteCarloTable from "../tables/MonteCarloTable";
+
+enum APIResponse {
+  OK = 200,
+  Created = 201,
+  NotFound = 404,
+  ServerError = 500,
+  UnAuthorized = 401,
+}
 
 // Define a strict Task type
 interface Task {
@@ -35,6 +52,8 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
   const [optimistic, setOptimistic] = useState(0.0);
   const [pessimistic, setPessimistic] = useState(0.0);
   const [results, setResults] = useState<Results>();
+  const [apiResponse, setApiResponse] = useState<number>(0);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const [data, setData] = useState<Data[]>();
   const [options, setOptions] = useState<AgChartOptions>({
@@ -112,9 +131,12 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
   };
 
   const handleQueryPertAnalysis = async () => {
+    setHasSubmitted(true);
     try {
       const res = await fetchPertData(postObject);
-      return setResults(res);
+
+      setApiResponse(res?.status);
+      setResults(res);
     } catch (err) {
       return console.log(err);
     }
@@ -183,6 +205,7 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
                 <Form.Control
                   required
                   type="number"
+                  min={0}
                   placeholder="Enter optmistic time"
                   value={optimistic}
                   onChange={(e) => setOptimistic(parseFloat(e.target.value))}
@@ -196,6 +219,7 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
                 <Form.Control
                   required
                   type="number"
+                  min={0}
                   placeholder="Enter pessimistic time"
                   value={pessimistic}
                   onChange={(e) => setPessimistic(parseFloat(e.target.value))}
@@ -226,7 +250,24 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
         )}
         {selectedTasks.length > 0 ? (
           <div className="mw-100 gap-2 hstack ">
-            <Button size="sm" onClick={handleQueryPertAnalysis}>
+            {/* <Button variant="secondary" size="sm" onClick={handleClearAllForms}>
+              Clear all forms
+            </Button> */}
+            <Button
+              onClick={handleQueryPertAnalysis}
+              className={`${
+                hasSubmitted && apiResponse === APIResponse.OK
+                  ? "bg-success"
+                  : ""
+              }`}
+            >
+              {hasSubmitted ? (
+                <Spinner animation="border" role="status">
+                  <span className="visually-hidden">Processing...</span>
+                </Spinner>
+              ) : hasSubmitted && apiResponse === 0 ? (
+                ""
+              ) : null}{" "}
               Submit Estimates
             </Button>
           </div>

@@ -43,7 +43,6 @@ function App() {
                 src={logo2}
                 alt="Software Project Estimator"
               />{" "}
-              Software Project Estimator
             </div>
             <Stack direction="horizontal" gap={1}>
               <Button

@@ -5,7 +5,6 @@ import PERTAnalysis from "./layout/PERT";
 import TimeSeriesAnalysis from "./layout/TimeSeries";
 
 import logo2 from "./assets/SPE 2.jpeg";
-import { Fonts } from "react-bootstrap-icons";
 
 interface Task {
   taskName: string;
@@ -50,7 +49,7 @@ function App() {
               <Button
                 size="sm"
                 variant="transparent"
-                className="border"
+                className="border fs-6"
                 onClick={() =>
                   setFontSize({
                     ...fontSize,
@@ -60,12 +59,12 @@ function App() {
                   })
                 }
               >
-                <Fonts className="fs-6" focusable={false} />
+                &#43;
               </Button>
               <Button
                 size="sm"
                 variant="transparent"
-                className="border"
+                className="border fs-4"
                 onClick={() =>
                   setFontSize({
                     ...fontSize,
@@ -75,21 +74,22 @@ function App() {
                   })
                 }
               >
-                <Fonts className="fs-4" focusable={false} />
+                &#43;
               </Button>
-              <Button size="sm" variant="transparent" className="border">
-                <Fonts
-                  className="fs-2"
-                  focusable={false}
-                  onClick={() =>
-                    setFontSize({
-                      ...fontSize,
-                      large: true,
-                      medium: false,
-                      small: false,
-                    })
-                  }
-                />
+              <Button
+                size="sm"
+                variant="transparent"
+                className="border fs-2"
+                onClick={() =>
+                  setFontSize({
+                    ...fontSize,
+                    large: true,
+                    medium: false,
+                    small: false,
+                  })
+                }
+              >
+                &#43;
               </Button>
             </Stack>
           </div>

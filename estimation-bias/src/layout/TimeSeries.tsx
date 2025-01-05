@@ -123,7 +123,9 @@ const TimeSeriesAnalysis = ({
         Update Trained Data
       </Button>
 
-      <h2 className="h5 fw-normal">Select tasks for Time Series Analysis</h2>
+      <h2 className="h5 fw-normal">
+        Select all tasks for Time Series Analysis
+      </h2>
 
       <div className="d-flex flex-fill form-generate hstack gap-2 flex-md-wrap flex-sm-wrap p-4 rounded-2 shadow-lg">
         {tasks.map((task) => (
@@ -149,10 +151,10 @@ const TimeSeriesAnalysis = ({
           lg={6}
           className="py-3 px-2 bg-light fw-light border-start border-5 border-primary"
         >
-          Note: For every selected task, you are to provide an estimated time in
-          non-decimal format. Example:{" "}
+          Note: <b>Select all tasks!</b> For every selected task, you are to
+          provide an estimated time in non-decimal format. Example:{" "}
           <em>
-            <strong>Data Backup Task - 100 minutes</strong>
+            <strong>Data Backup Task - 100</strong>
           </em>
         </Col>
         <div className="d-flex flex-wrap gap-2">

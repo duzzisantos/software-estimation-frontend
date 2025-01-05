@@ -15,7 +15,7 @@ function App() {
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
   const [selectedNewTasks, setSelectedNewsTasks] = useState<Task[]>([]);
   const [fontSize, setFontSize] = useState({
-    small: true,
+    small: false,
     medium: false,
     large: false,
   });

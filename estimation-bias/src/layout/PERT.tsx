@@ -3,16 +3,7 @@ import { Data } from "../graphs/MonteCarloSimulation";
 import { AgCharts } from "ag-charts-react";
 import { AgChartOptions } from "ag-charts-community";
 import { TaskInput } from "../forms/FormFactory";
-import {
-  Alert,
-  Badge,
-  Button,
-  Col,
-  Form,
-  Tab,
-  Tabs,
-  Spinner,
-} from "react-bootstrap";
+import { Alert, Badge, Button, Col, Form, Tab, Tabs } from "react-bootstrap";
 import { tasks } from "../utils/data";
 import fetchPertData from "../utils/fetchPertData";
 import MonteCarloTable from "../tables/MonteCarloTable";
@@ -261,13 +252,6 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
                   : ""
               }`}
             >
-              {hasSubmitted ? (
-                <Spinner animation="border" role="status">
-                  <span className="visually-hidden">Processing...</span>
-                </Spinner>
-              ) : hasSubmitted && apiResponse === 0 ? (
-                ""
-              ) : null}{" "}
               Submit Estimates
             </Button>
           </div>

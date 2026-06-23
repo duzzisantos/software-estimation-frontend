@@ -1,11 +1,14 @@
 import { useState } from "react";
-import "./App.css";
-import { Container, Row, Col, Tab, Tabs, Stack, Button } from "react-bootstrap";
+import { Toaster, toast } from "sonner";
+import { Activity } from "lucide-react";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { UserProfile } from "@/components/user-profile";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 import PERTAnalysis from "./layout/PERT";
 import TimeSeriesAnalysis from "./layout/TimeSeries";
 import MultilinearRegression from "./layout/MultilinearRegression";
-
-import logo2 from "./assets/SPE 2.jpeg";
 
 interface Task {
   taskName: string;
@@ -15,97 +18,79 @@ interface Task {
 function App() {
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
   const [selectedNewTasks, setSelectedNewsTasks] = useState<Task[]>([]);
-  const [fontSize, setFontSize] = useState({
-    small: false,
-    medium: false,
-    large: false,
-  });
 
   return (
-    <Container
-      fluid
-      className={`flex-grow-0 flex-shrink-1 text-dark vh-100 App ${
-        fontSize.large
-          ? "fs-2"
-          : fontSize.medium
-          ? "fs-4"
-          : fontSize.small
-          ? "fs-6"
-          : "fs-6"
-      }`}
-    >
-      <Row>
-        <Col>
-          <div className="h6 text-secondary fw-bold border-bottom border-2 d-flex justify-content-between hstack">
-            <div className="mt-2">
-              <img
-                height={60}
-                width={100}
-                src={logo2}
-                alt="Software Project Estimator"
-              />
+    <ThemeProvider defaultTheme="light" storageKey="spe-ui-theme">
+      <div className="min-h-screen bg-background">
+        {/* Navbar */}
+        <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
+          <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
+            {/* Logo */}
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-400 shadow-sm">
+                <Activity className="h-4.5 w-4.5 text-white" strokeWidth={2.5} />
+              </div>
+              <span className="text-base font-semibold tracking-tight">
+                SPE
+              </span>
+              <span className="hidden text-xs text-muted-foreground sm:inline">
+                Software Project Estimator
+              </span>
             </div>
-            <Stack direction="horizontal" gap={1}>
-              <Button
-                size="sm"
-                variant="transparent"
-                className="border fs-6"
-                onClick={() =>
-                  setFontSize({ small: true, medium: false, large: false })
-                }
-              >
-                &#43;
-              </Button>
-              <Button
-                size="sm"
-                variant="transparent"
-                className="border fs-4"
-                onClick={() =>
-                  setFontSize({ small: false, medium: true, large: false })
-                }
-              >
-                &#43;
-              </Button>
-              <Button
-                size="sm"
-                variant="transparent"
-                className="border fs-2"
-                onClick={() =>
-                  setFontSize({ small: false, medium: false, large: true })
-                }
-              >
-                &#43;
-              </Button>
-            </Stack>
+
+            {/* Right side controls */}
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <Separator orientation="vertical" className="mx-1 h-6" />
+              <UserProfile />
+            </div>
           </div>
-          <Tabs defaultActiveKey={"pert"} variant="underline" className="p-3">
-            <Tab eventKey={"pert"} title="PERT" className="fw-bold">
+        </header>
+
+        {/* Main content */}
+        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+          <Tabs
+            defaultValue="pert"
+            onValueChange={(val) =>
+              toast(`Switched to ${val === "pert" ? "PERT" : val === "time-series" ? "Time Series" : "Regression"} analysis`)
+            }
+          >
+            <TabsList className="mb-6">
+              <TabsTrigger value="pert">PERT</TabsTrigger>
+              <TabsTrigger value="time-series">Time Series</TabsTrigger>
+              <TabsTrigger value="regression">Regression</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="pert">
               <PERTAnalysis
                 selectedTasks={selectedTasks}
                 setSelectedTasks={setSelectedTasks}
               />
-            </Tab>
-            <Tab
-              eventKey={"time-series"}
-              title="Time Series"
-              className="fw-bold"
-            >
+            </TabsContent>
+
+            <TabsContent value="time-series">
               <TimeSeriesAnalysis
                 setSelectedNewTasks={setSelectedNewsTasks}
                 selectedNewTasks={selectedNewTasks}
               />
-            </Tab>
-            <Tab
-              eventKey={"regression"}
-              title="Multilinear Regression"
-              className="fw-bold"
-            >
+            </TabsContent>
+
+            <TabsContent value="regression">
               <MultilinearRegression />
-            </Tab>
+            </TabsContent>
           </Tabs>
-        </Col>
-      </Row>
-    </Container>
+        </main>
+      </div>
+
+      <Toaster
+        position="bottom-right"
+        richColors
+        closeButton
+        toastOptions={{
+          className: "font-sans",
+        }}
+      />
+    </ThemeProvider>
   );
 }
 

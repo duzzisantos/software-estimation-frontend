@@ -1,53 +1,60 @@
-import { Table } from "react-bootstrap";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
 import { Results } from "../utils/usePertAnalysis";
 
 interface Props {
   result: Results | undefined;
 }
+
 const MonteCarloTable = ({ result }: Props) => {
+  if (!result) return null;
+
+  const headers: string[] = [];
+  const values: string[] = [];
+
+  Object.entries(result).forEach(([key]) => {
+    if (
+      key.includes("most_likely") ||
+      key.includes("optimistic") ||
+      key.includes("pessimistic")
+    ) {
+      headers.push(key.split("_").join(" "));
+      values.push(String(result[key as keyof Results]));
+    } else if (key === "predictions") {
+      Object.entries(result.predictions).forEach(([pKey, pVal]) => {
+        headers.push(pKey.split("_").join(" "));
+        values.push(String(pVal));
+      });
+    }
+  });
+
   return (
-    <div className="border mt-5 rounded-3 fw-normal">
-      <Table striped responsive>
-        <thead>
-          <tr>
-            {result !== undefined
-              ? Object.entries(result)?.map(([key]) =>
-                  key.includes("most_likely") ||
-                  key.includes("optimistic") ||
-                  key.includes("pessimistic") ? (
-                    <th className="text-capitalize" key={key}>
-                      {key.split("_").join(" ")}
-                    </th>
-                  ) : key.includes("predictions") ? (
-                    Object.entries(result.predictions)?.map(([i, j]) => (
-                      <th className="text-capitalize" key={`${i}-${j}`}>
-                        {i.split("_").join(" ")}
-                      </th>
-                    ))
-                  ) : null
-                )
-              : null}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            {result !== undefined
-              ? Object.entries(result)?.map(([key, value]) =>
-                  key.includes("most_likely") ||
-                  key.includes("optimistic") ||
-                  key.includes("pessimistic") ? (
-                    <td className="text-capitalize" key={`${key}-${value}`}>
-                      {String(value)}
-                    </td>
-                  ) : key.includes("predictions") ? (
-                    Object.entries(result.predictions)?.map(([i, j]) => (
-                      <td key={`${i}-${j}`}>{String(j)}</td>
-                    ))
-                  ) : null
-                )
-              : null}
-          </tr>
-        </tbody>
+    <div className="mt-4 rounded-lg border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            {headers.map((h) => (
+              <TableHead key={h} className="capitalize">
+                {h}
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow>
+            {values.map((v, i) => (
+              <TableCell key={i} className="font-mono text-sm">
+                {v}
+              </TableCell>
+            ))}
+          </TableRow>
+        </TableBody>
       </Table>
     </div>
   );

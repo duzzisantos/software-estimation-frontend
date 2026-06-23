@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   LineChart,
   Line,
@@ -10,94 +9,60 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { PALETTE } from "../utils/generateRandomColors";
-import { Alert } from "react-bootstrap";
-
-interface ResponseData {
-  training_date: string;
-  task_categories: string[];
-  predicted_durations: number[];
-}
+import { useChartData } from "../utils/useChartData";
 
 const TimeSeriesChart = () => {
-  const [responseData, setResponseData] = useState<ResponseData[]>([]);
-  const url = import.meta.env.VITE_API_URL_TRAINING;
+  const { responseData, chartData } = useChartData();
 
-  useEffect(() => {
-    async function fetchTrainedData() {
-      try {
-        const response = await fetch(`${url}/GetTrainedWorkLogs`, {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
-
-        if (!response.ok) {
-          throw new Error(`${response.status}, Cause: ${response.type}`);
-        }
-        const data = await response.json();
-        setResponseData(data);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    fetchTrainedData();
-  }, [url]);
-
-  if (!responseData.length) {
+  if (!chartData.data.length) {
     return (
-      <Alert variant="info" className="border-0 mt-3 fw-normal">
+      <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
         No training data available yet
-      </Alert>
+      </div>
     );
   }
 
-  const recent = [...responseData].reverse().slice(0, 6);
-  const categories = recent[0]?.task_categories ?? [];
-
-  const chartData = categories.map((cat, i) => {
-    const point: Record<string, string | number> = {
-      task: cat.split("_").join(" "),
-    };
-    recent.forEach((entry) => {
-      const label = new Date(entry.training_date).toLocaleDateString();
-      point[label] = Math.round(entry.predicted_durations[i] ?? 0);
-    });
-    return point;
-  });
-
-  const dateKeys = recent.map((entry) =>
-    new Date(entry.training_date).toLocaleDateString()
-  );
-
   return (
     <div>
-      <p className="text-muted mt-2 mb-3" style={{ fontSize: "0.85rem" }}>
+      <p className="mb-3 mt-2 text-xs text-muted-foreground">
         Predicted durations across {responseData.length} training periods — last
         6 shown
       </p>
-      <ResponsiveContainer width="100%" height={500}>
+      <ResponsiveContainer width="100%" height={460}>
         <LineChart
-          data={chartData}
+          data={chartData.data}
           margin={{ top: 10, right: 20, bottom: 80, left: 20 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="hsl(var(--border))"
+          />
           <XAxis
             dataKey="task"
             angle={-45}
             textAnchor="end"
             height={100}
-            tick={{ fontSize: 9 }}
+            tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }}
           />
           <YAxis
+            tick={{ fill: "hsl(var(--muted-foreground))" }}
             label={{
               value: "Predicted Duration",
               angle: -90,
               position: "insideLeft",
+              fill: "hsl(var(--muted-foreground))",
             }}
           />
-          <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid #ddd" }} />
+          <Tooltip
+            contentStyle={{
+              borderRadius: 10,
+              border: "1px solid hsl(var(--border))",
+              background: "hsl(var(--popover))",
+              color: "hsl(var(--popover-foreground))",
+            }}
+          />
           <Legend wrapperStyle={{ paddingTop: 10 }} />
-          {dateKeys.map((key, idx) => (
+          {chartData.dateKeys.map((key, idx) => (
             <Line
               key={key}
               type="monotone"

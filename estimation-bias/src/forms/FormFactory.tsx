@@ -1,4 +1,5 @@
-import { Form } from "react-bootstrap";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface TaskProps {
   taskName: string;
@@ -8,14 +9,14 @@ interface TaskProps {
 
 export const TaskInput = ({ taskName, taskValue, setTaskValue }: TaskProps) => {
   return (
-    <Form.Group className="mb-2 col-lg-2 col-sm-8 col-md-8">
-      <Form.Label className="fw-light text-capitalize">{taskName}</Form.Label>
-      <Form.Control
+    <div className="space-y-1.5">
+      <Label className="capitalize text-xs">{taskName}</Label>
+      <Input
         type="number"
         value={taskValue}
         onChange={(e) => setTaskValue(parseFloat(e.target.value))}
         min={0}
       />
-    </Form.Group>
+    </div>
   );
 };

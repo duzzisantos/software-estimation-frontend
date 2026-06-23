@@ -215,12 +215,12 @@ const TimeSeriesAnalysis = ({
                   textAnchor="end"
                   height={100}
                   tick={{
-                    fontSize: 9,
+                    fontSize: 10,
                     fill: "hsl(var(--muted-foreground))",
                   }}
                 />
                 <YAxis
-                  tick={{ fill: "hsl(var(--muted-foreground))" }}
+                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
                   label={{
                     value: "Predicted Duration",
                     angle: -90,

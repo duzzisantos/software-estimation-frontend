@@ -105,12 +105,12 @@ const MultilinearRegression = () => {
     }
   };
 
-  const tooltipStyle = {
-    borderRadius: 10,
-    border: "1px solid hsl(var(--border))",
-    background: "hsl(var(--popover))",
-    color: "hsl(var(--popover-foreground))",
-  };
+  // const tooltipStyle = {
+  //   borderRadius: 10,
+  //   border: "1px solid hsl(var(--border))",
+  //   background: "hsl(var(--popover))",
+  //   color: "hsl(var(--popover-foreground))",
+  // };
 
   return (
     <div className="space-y-6">

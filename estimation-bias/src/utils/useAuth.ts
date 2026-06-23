@@ -1,11 +1,9 @@
 import { useState, useCallback } from "react";
 
-const API_KEY_HASH =
-  "ae3ed1d24859737ae96d1bab375234925179b033986511da5b3116923bc812e2";
-const UNLOCK_KEY_HASH =
-  "5ba4024c3fb4c8b2be6a53722a61cff17f4de3ba35f909017d3d511c7a767291";
+const API_KEY_HASH = process.env.API_KEY_HASH as string;
+const UNLOCK_KEY_HASH = process.env.UNLOCK_KEY_HASH as string;
 
-const SESSION_KEY = "spe-auth-session";
+const SESSION_KEY = process.env.SESSION_KEY as string;
 
 async function sha256(message: string): Promise<string> {
   const msgBuffer = new TextEncoder().encode(message);
@@ -28,7 +26,7 @@ function isSessionValid(): boolean {
 function persistSession() {
   sessionStorage.setItem(
     SESSION_KEY,
-    JSON.stringify({ authenticated: true, ts: Date.now() })
+    JSON.stringify({ authenticated: true, ts: Date.now() }),
   );
 }
 
@@ -59,7 +57,7 @@ export function useAuth() {
         setLoading(false);
       }
     },
-    []
+    [],
   );
 
   const logout = useCallback(() => {

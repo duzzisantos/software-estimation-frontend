@@ -230,7 +230,7 @@ const MultilinearRegression = () => {
                   <BarChart
                     data={filteredCoefficients}
                     layout="vertical"
-                    margin={{ top: 10, right: 30, bottom: 10, left: 100 }}
+                    margin={{ top: 10, right: 30, bottom: 10, left: 30 }}
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
@@ -252,7 +252,16 @@ const MultilinearRegression = () => {
                         fill: "hsl(var(--muted-foreground))",
                       }}
                     />
-                    <Tooltip contentStyle={tooltipStyle} />
+                    <Tooltip
+                      contentStyle={{
+                        borderRadius: 10,
+                        border: "1px solid hsl(var(--border))",
+                        background: "hsl(var(--popover))",
+                        color: "hsl(var(--popover-foreground))",
+                        textTransform: "capitalize",
+                        fontSize: "11px",
+                      }}
+                    />
                     <ReferenceLine
                       x={0}
                       stroke="hsl(var(--muted-foreground))"
@@ -289,7 +298,7 @@ const MultilinearRegression = () => {
             <CardContent>
               <ResponsiveContainer width="100%" height={380}>
                 <ScatterChart
-                  margin={{ top: 10, right: 30, bottom: 30, left: 20 }}
+                  margin={{ top: 15, right: 30, bottom: 30, left: 20 }}
                 >
                   <CartesianGrid
                     strokeDasharray="3 3"
@@ -325,8 +334,17 @@ const MultilinearRegression = () => {
                       fill: "hsl(var(--muted-foreground))",
                     }}
                   />
-                  <Tooltip contentStyle={tooltipStyle} />
-                  <Legend className="mt-5" />
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: 10,
+                      border: "1px solid hsl(var(--border))",
+                      background: "hsl(var(--popover))",
+                      color: "hsl(var(--popover-foreground))",
+                      textTransform: "capitalize",
+                      fontSize: "11px",
+                    }}
+                  />
+                  <Legend wrapperStyle={{ paddingTop: 10, fontSize: "11px" }} />
                   <Scatter name="Samples" data={scatterData} fill="#a78bfa" />
                 </ScatterChart>
               </ResponsiveContainer>
@@ -379,7 +397,16 @@ const MultilinearRegression = () => {
                       fill: "hsl(var(--muted-foreground))",
                     }}
                   />
-                  <Tooltip contentStyle={tooltipStyle} />
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: 10,
+                      border: "1px solid hsl(var(--border))",
+                      background: "hsl(var(--popover))",
+                      color: "hsl(var(--popover-foreground))",
+                      textTransform: "capitalize",
+                      fontSize: "11px",
+                    }}
+                  />
                   <ReferenceLine y={0} stroke="hsl(var(--muted-foreground))" />
                   <Bar
                     dataKey="residual"
@@ -401,6 +428,9 @@ const MultilinearRegression = () => {
               <CardTitle className="text-base">
                 Top Influential Features
               </CardTitle>
+              <CardDescription>
+                Tasks taking longer time to fulfill
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -422,6 +452,7 @@ const MultilinearRegression = () => {
                       </TableCell>
                       <TableCell>
                         <Badge
+                          className="rounded-0"
                           variant={
                             item.coefficient >= 0 ? "success" : "destructive"
                           }

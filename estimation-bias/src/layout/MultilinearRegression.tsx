@@ -2,7 +2,13 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import {
   Table,
   TableHeader,
@@ -50,11 +56,11 @@ const MultilinearRegression = () => {
 
   const allTasks = useMemo(
     () => coefficientData.map((c) => c.task.split(" ").join("_")),
-    [coefficientData]
+    [coefficientData],
   );
 
   const [visibleTasks, setVisibleTasks] = useState<Set<string>>(
-    () => new Set<string>()
+    () => new Set<string>(),
   );
 
   const initialized = useMemo(() => {
@@ -74,9 +80,9 @@ const MultilinearRegression = () => {
   const filteredCoefficients = useMemo(
     () =>
       coefficientData.filter((c) =>
-        effectiveVisible.has(c.task.split(" ").join("_"))
+        effectiveVisible.has(c.task.split(" ").join("_")),
       ),
-    [coefficientData, effectiveVisible]
+    [coefficientData, effectiveVisible],
   );
 
   const onTrain = async () => {
@@ -224,7 +230,7 @@ const MultilinearRegression = () => {
                   <BarChart
                     data={filteredCoefficients}
                     layout="vertical"
-                    margin={{ top: 10, right: 30, bottom: 10, left: 140 }}
+                    margin={{ top: 10, right: 30, bottom: 10, left: 100 }}
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
@@ -247,7 +253,10 @@ const MultilinearRegression = () => {
                       }}
                     />
                     <Tooltip contentStyle={tooltipStyle} />
-                    <ReferenceLine x={0} stroke="hsl(var(--muted-foreground))" />
+                    <ReferenceLine
+                      x={0}
+                      stroke="hsl(var(--muted-foreground))"
+                    />
                     <Bar
                       dataKey="coefficient"
                       radius={[0, 4, 4, 0]}
@@ -317,7 +326,7 @@ const MultilinearRegression = () => {
                     }}
                   />
                   <Tooltip contentStyle={tooltipStyle} />
-                  <Legend />
+                  <Legend className="mt-5" />
                   <Scatter name="Samples" data={scatterData} fill="#a78bfa" />
                 </ScatterChart>
               </ResponsiveContainer>
@@ -371,10 +380,7 @@ const MultilinearRegression = () => {
                     }}
                   />
                   <Tooltip contentStyle={tooltipStyle} />
-                  <ReferenceLine
-                    y={0}
-                    stroke="hsl(var(--muted-foreground))"
-                  />
+                  <ReferenceLine y={0} stroke="hsl(var(--muted-foreground))" />
                   <Bar
                     dataKey="residual"
                     radius={[4, 4, 4, 4]}

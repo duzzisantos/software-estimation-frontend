@@ -44,7 +44,7 @@ const TimeSeriesAnalysis = ({
   } = useTimeSeriesData(selectedNewTasks, setSelectedNewTasks);
 
   const [visibleTasks, setVisibleTasks] = useState<Set<string>>(
-    () => new Set(tasks)
+    () => new Set(tasks),
   );
 
   const filteredChartData = useMemo(() => {
@@ -64,7 +64,7 @@ const TimeSeriesAnalysis = ({
       isAdding
         ? `Added ${taskName.split("_").join(" ")}`
         : `Removed ${taskName.split("_").join(" ")}`,
-      { icon: isAdding ? "+" : "-" }
+      { icon: isAdding ? "+" : "-" },
     );
   };
 
@@ -137,9 +137,7 @@ const TimeSeriesAnalysis = ({
             <strong className="text-foreground">Select all tasks!</strong> For
             every selected task, provide an estimated time in non-decimal
             format. Example:{" "}
-            <strong className="text-foreground">
-              Data Backup Task — 100
-            </strong>
+            <strong className="text-foreground">Data Backup Task — 100</strong>
           </div>
 
           <TaskMultiSelect
@@ -200,9 +198,9 @@ const TimeSeriesAnalysis = ({
             onHideAll={() => setVisibleTasks(new Set())}
           />
         </CardHeader>
-        <CardContent>
+        <CardContent className="mt-3">
           {filteredChartData.data.length > 0 ? (
-            <ResponsiveContainer width="100%" height={460}>
+            <ResponsiveContainer width="100%" height={500}>
               <LineChart
                 data={filteredChartData.data}
                 margin={{ top: 10, right: 20, bottom: 80, left: 20 }}
@@ -236,9 +234,11 @@ const TimeSeriesAnalysis = ({
                     border: "1px solid hsl(var(--border))",
                     background: "hsl(var(--popover))",
                     color: "hsl(var(--popover-foreground))",
+                    textTransform: "capitalize",
+                    fontSize: "11px",
                   }}
                 />
-                <Legend wrapperStyle={{ paddingTop: 10 }} />
+                <Legend wrapperStyle={{ paddingTop: 10, fontSize: "11px" }} />
                 {filteredChartData.dateKeys.map((key, idx) => (
                   <Line
                     key={key}

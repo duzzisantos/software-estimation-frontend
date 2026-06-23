@@ -3,6 +3,7 @@ import "./App.css";
 import { Container, Row, Col, Tab, Tabs, Stack, Button } from "react-bootstrap";
 import PERTAnalysis from "./layout/PERT";
 import TimeSeriesAnalysis from "./layout/TimeSeries";
+import MultilinearRegression from "./layout/MultilinearRegression";
 
 import logo2 from "./assets/SPE 2.jpeg";
 
@@ -10,6 +11,7 @@ interface Task {
   taskName: string;
   timeEstimate: number;
 }
+
 function App() {
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
   const [selectedNewTasks, setSelectedNewsTasks] = useState<Task[]>([]);
@@ -34,15 +36,14 @@ function App() {
     >
       <Row>
         <Col>
-          <div className="h6 text-secondary fw-bold border-bottom border-2  d-flex justify-content-between hstack">
-            {" "}
+          <div className="h6 text-secondary fw-bold border-bottom border-2 d-flex justify-content-between hstack">
             <div className="mt-2">
               <img
                 height={60}
                 width={100}
                 src={logo2}
                 alt="Software Project Estimator"
-              />{" "}
+              />
             </div>
             <Stack direction="horizontal" gap={1}>
               <Button
@@ -50,12 +51,7 @@ function App() {
                 variant="transparent"
                 className="border fs-6"
                 onClick={() =>
-                  setFontSize({
-                    ...fontSize,
-                    small: true,
-                    medium: false,
-                    large: false,
-                  })
+                  setFontSize({ small: true, medium: false, large: false })
                 }
               >
                 &#43;
@@ -65,12 +61,7 @@ function App() {
                 variant="transparent"
                 className="border fs-4"
                 onClick={() =>
-                  setFontSize({
-                    ...fontSize,
-                    medium: true,
-                    large: false,
-                    small: false,
-                  })
+                  setFontSize({ small: false, medium: true, large: false })
                 }
               >
                 &#43;
@@ -80,12 +71,7 @@ function App() {
                 variant="transparent"
                 className="border fs-2"
                 onClick={() =>
-                  setFontSize({
-                    ...fontSize,
-                    large: true,
-                    medium: false,
-                    small: false,
-                  })
+                  setFontSize({ small: false, medium: false, large: true })
                 }
               >
                 &#43;
@@ -108,6 +94,13 @@ function App() {
                 setSelectedNewTasks={setSelectedNewsTasks}
                 selectedNewTasks={selectedNewTasks}
               />
+            </Tab>
+            <Tab
+              eventKey={"regression"}
+              title="Multilinear Regression"
+              className="fw-bold"
+            >
+              <MultilinearRegression />
             </Tab>
           </Tabs>
         </Col>

@@ -1,26 +1,23 @@
 import { Dispatch, SetStateAction } from "react";
 import { TaskInput } from "../forms/FormFactory";
-import { Button, Col, Form } from "react-bootstrap";
+import { Alert, Button, Col, Form } from "react-bootstrap";
 import { tasks } from "../utils/data";
-import createWorkLogs from "../utils/fetchTimeSeriesData";
+import { useTimeSeriesData } from "../utils/useTimeSeriesData";
+import { PALETTE } from "../utils/generateRandomColors";
 import {
-  fetchDataTraining,
-  storeDataTraining,
-} from "../utils/fetchDataTraining";
-import formatDate from "../utils/formatDate";
-import TimeSeriesChart from "../graphs/TimeSeriesChart";
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
-// Define a strict Task type
 interface Task {
   taskName: string;
   timeEstimate: number;
-}
-
-// Define the type for `obj`
-interface PostObject {
-  [taskName: string]: number | string; // Dynamic keys based on `taskName`, with values of either `number` or `string`
-  last_updated: string;
-  submitted_by: string;
 }
 
 interface FormSelection {
@@ -32,108 +29,38 @@ const TimeSeriesAnalysis = ({
   selectedNewTasks,
   setSelectedNewTasks,
 }: FormSelection) => {
-  // Handle task selection, adding/removing task objects
-  const handleSelectedTasks = (newTaskName: string) => {
-    setSelectedNewTasks((prevTasks) => {
-      const taskExists = prevTasks.find(
-        (task) => task.taskName === newTaskName
-      );
-
-      if (taskExists) {
-        // Remove the task if it exists
-        return prevTasks.filter((task) => task.taskName !== newTaskName);
-      } else {
-        // Add a new task with a default time estimate
-        return [...prevTasks, { taskName: newTaskName, timeEstimate: 0.0 }];
-      }
-    });
-  };
-
-  // Update the time estimate of a task
-  const updateTaskTime = (taskName: string, newTimeEstimate: number) => {
-    setSelectedNewTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.taskName === taskName
-          ? { ...task, timeEstimate: newTimeEstimate }
-          : task
-      )
-    );
-  };
-
-  const postObject = () => {
-    const obj: PostObject = {
-      last_updated: formatDate(),
-      submitted_by: "Harry West",
-    };
-
-    for (let i = 0; i < selectedNewTasks.length; i++) {
-      const [key, value] = [
-        selectedNewTasks[i].taskName,
-        selectedNewTasks[i].timeEstimate,
-      ];
-      obj[key] = value;
-    }
-
-    return obj;
-  };
-
-  const handleSubmitTasks = async () => {
-    try {
-      const res = await createWorkLogs(postObject());
-      return console.log(res);
-    } catch (err) {
-      return console.warn(err);
-    }
-  };
-
-  const handleRetrainData = async () => {
-    try {
-      const res = await fetchDataTraining();
-      return console.log(res.status);
-    } catch (err) {
-      return console.error(err);
-    }
-  };
-
-  const handleStoreData = async () => {
-    try {
-      const res = await storeDataTraining();
-      return console.log(res.status);
-    } catch (err) {
-      return console.error(err);
-    }
-  };
+  const {
+    responseData,
+    chartData,
+    handleSelectedTasks,
+    updateTaskTime,
+    handleSubmitTasks,
+    handleRetrainData,
+    handleStoreData,
+  } = useTimeSeriesData(selectedNewTasks, setSelectedNewTasks);
 
   return (
     <Col className="my-3 p-3">
-      <Button
-        variant="primary"
-        size="sm"
-        className="my-3"
-        onClick={handleRetrainData}
-      >
-        Retrain Data
-      </Button>
-      <Button
-        variant="primary"
-        size="sm"
-        className="my-3 mx-2"
-        onClick={handleStoreData}
-      >
-        Update Trained Data
-      </Button>
+      <div className="d-flex gap-2 mb-3">
+        <Button variant="primary" size="sm" onClick={handleRetrainData}>
+          Retrain Data
+        </Button>
+        <Button variant="outline-secondary" size="sm" onClick={handleStoreData}>
+          Update Trained Data
+        </Button>
+      </div>
 
       <h2 className="h5 fw-normal">
         Select all tasks for Time Series Analysis
       </h2>
 
-      <div className="d-flex flex-fill form-generate hstack gap-2 flex-md-wrap flex-sm-wrap p-4 rounded-2 shadow-lg">
+      <div className="d-flex flex-fill form-generate hstack gap-2 flex-md-wrap flex-sm-wrap p-3 py-4 rounded-3 shadow-sm border">
         {tasks.map((task) => (
           <Form.Group
             key={task}
             className="bg-info-subtle fw-light rounded-3 hstack gap-2 p-2"
           >
-            <Form.Label className="text-capitalize">
+            <Form.Label className="text-capitalize mb-0">
               {task.split("_").join(" ")}
             </Form.Label>
             <Form.Check
@@ -145,14 +72,14 @@ const TimeSeriesAnalysis = ({
         ))}
       </div>
 
-      <Form className="d-flex flex-column gap-3 bg-light-subtle my-3 p-4 rounded-2 shadow-lg">
+      <Form className="d-flex flex-column gap-3 bg-light-subtle my-4 p-3 rounded-2 shadow-sm border">
         <h2 className="fw-normal h5">Provide Work Logs</h2>
         <Col
           lg={6}
-          className="py-3 px-2 bg-light fw-light border-start border-5 border-primary"
+          className="py-3 px-2 bg-light fw-light border-start border-5 border-primary rounded-1"
         >
-          Note: <b>Select all tasks!</b> For every selected task, you are to
-          provide an estimated time in non-decimal format. Example:{" "}
+          Note: <b>Select all tasks!</b> For every selected task, provide an
+          estimated time in non-decimal format. Example:{" "}
           <em>
             <strong>Data Backup Task - 100</strong>
           </em>
@@ -169,22 +96,64 @@ const TimeSeriesAnalysis = ({
             />
           ))}
         </div>
-        {selectedNewTasks.length > 0 ? (
-          <div className="mw-100 gap-2 hstack ">
+        {selectedNewTasks.length > 0 && (
+          <div className="mw-100 gap-2 hstack">
             <Button size="sm" onClick={handleSubmitTasks}>
               Submit Tasks
             </Button>
           </div>
-        ) : null}
+        )}
       </Form>
 
-      <Col className="p-4 rounded-2 shadow-lg fw-normal">
+      <Col className="p-3 rounded-3 shadow-sm border fw-normal">
         <h2 className="h5">Estimation Result Analysis</h2>
-        <p>
-          Select specific periods or nearest dates to see trained estimated
-          times for completing project tasks
+        <p className="text-muted" style={{ fontSize: "0.85rem" }}>
+          Predicted durations across {responseData.length} training periods —
+          last 6 shown
         </p>
-        <TimeSeriesChart />
+        {chartData.data.length > 0 ? (
+          <ResponsiveContainer width="100%" height={500}>
+            <LineChart
+              data={chartData.data}
+              margin={{ top: 10, right: 20, bottom: 80, left: 20 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+              <XAxis
+                dataKey="task"
+                angle={-45}
+                textAnchor="end"
+                height={100}
+                tick={{ fontSize: 9 }}
+              />
+              <YAxis
+                label={{
+                  value: "Predicted Duration",
+                  angle: -90,
+                  position: "insideLeft",
+                }}
+              />
+              <Tooltip
+                contentStyle={{ borderRadius: 8, border: "1px solid #ddd" }}
+              />
+              <Legend wrapperStyle={{ paddingTop: 10 }} />
+              {chartData.dateKeys.map((key, idx) => (
+                <Line
+                  key={key}
+                  type="monotone"
+                  dataKey={key}
+                  stroke={PALETTE[idx % PALETTE.length]}
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 5 }}
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <Alert variant="info" className="border-0 fw-normal">
+            No training data available yet
+          </Alert>
+        )}
       </Col>
     </Col>
   );

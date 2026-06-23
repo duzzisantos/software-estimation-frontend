@@ -1,5 +1,5 @@
 import { Table } from "react-bootstrap";
-import { Results } from "../layout/PERT";
+import { Results } from "../utils/usePertAnalysis";
 
 interface Props {
   result: Results | undefined;
@@ -37,11 +37,11 @@ const MonteCarloTable = ({ result }: Props) => {
                   key.includes("optimistic") ||
                   key.includes("pessimistic") ? (
                     <td className="text-capitalize" key={`${key}-${value}`}>
-                      {value}
+                      {String(value)}
                     </td>
                   ) : key.includes("predictions") ? (
                     Object.entries(result.predictions)?.map(([i, j]) => (
-                      <td key={`${i}-${j}`}>{j}</td>
+                      <td key={`${i}-${j}`}>{String(j)}</td>
                     ))
                   ) : null
                 )

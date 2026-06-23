@@ -1,17 +1,1 @@
-function useChartOptions(year: string, period: number) {
-  const options = {
-    responsive: true,
-    plugins: {
-      // legend: {
-      //   position: "top",
-      // },
-      title: {
-        display: true,
-        text: ` Predicted durations for 29 tasks after ${period} training periods - trained by Tensorflow and Scikit Learn ${year} `,
-      },
-    },
-  };
-  return options;
-}
-
-export default useChartOptions;
+// Deprecated: chart options are now configured inline with recharts

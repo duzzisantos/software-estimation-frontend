@@ -10,17 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "ag-charts-community": "^10.3.3",
-    "ag-charts-react": "^10.3.3",
-    "ag-grid-react": "^32.3.3",
     "bootstrap": "^5.3.3",
-    "chart.js": "^4.4.4",
-    "common.js": "^1.1.1",
-    "d3": "^7.9.0",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.5",
-    "react-chartjs-2": "^5.2.0",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "recharts": "^3.9.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

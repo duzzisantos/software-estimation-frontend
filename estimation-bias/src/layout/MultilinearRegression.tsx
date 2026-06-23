@@ -456,7 +456,7 @@ const MultilinearRegression = () => {
                       </TableCell>
                       <TableCell>
                         <Badge
-                          className="rounded-none capitalize"
+                          className="rounded-sm capitalize"
                           variant={
                             item.coefficient >= 0 ? "success" : "destructive"
                           }

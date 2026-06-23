@@ -198,9 +198,9 @@ const TimeSeriesAnalysis = ({
             onHideAll={() => setVisibleTasks(new Set())}
           />
         </CardHeader>
-        <CardContent className="mt-3">
+        <CardContent className="mt-5">
           {filteredChartData.data.length > 0 ? (
-            <ResponsiveContainer width="100%" height={500}>
+            <ResponsiveContainer width="100%" height={450}>
               <LineChart
                 data={filteredChartData.data}
                 margin={{ top: 10, right: 20, bottom: 80, left: 20 }}
@@ -226,6 +226,7 @@ const TimeSeriesAnalysis = ({
                     angle: -90,
                     position: "insideLeft",
                     fill: "hsl(var(--muted-foreground))",
+                    fontSize: "11px",
                   }}
                 />
                 <Tooltip

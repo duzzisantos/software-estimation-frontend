@@ -4,13 +4,13 @@ import { TaskInput } from "../forms/FormFactory";
 import { tasks } from "../utils/data";
 import { usePertAnalysis } from "../utils/usePertAnalysis";
 import MonteCarloTable from "../tables/MonteCarloTable";
+import { TaskMultiSelect } from "@/components/task-multiselect";
 import { TaskFilter } from "@/components/task-filter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   BarChart,
@@ -51,9 +51,7 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
     () => new Set(tasks)
   );
 
-  const filteredChartData = useMemo(() => {
-    return chartData;
-  }, [chartData]);
+  const filteredChartData = useMemo(() => chartData, [chartData]);
 
   const onTaskToggle = (taskName: string) => {
     handleSelectedTasks(taskName);
@@ -64,6 +62,20 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
         : `Removed ${taskName.split("_").join(" ")}`,
       { icon: isAdding ? "+" : "-" }
     );
+  };
+
+  const onSelectAll = () => {
+    tasks.forEach((t) => {
+      if (!selectedTasks.find((s) => s.taskName === t)) {
+        handleSelectedTasks(t);
+      }
+    });
+    toast.success("All tasks selected");
+  };
+
+  const onClearAll = () => {
+    setSelectedTasks([]);
+    toast("All tasks cleared");
   };
 
   const onSubmit = async () => {
@@ -90,56 +102,31 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
 
   return (
     <div className="space-y-6">
-      {/* Task Selection */}
+      {/* Task Selection + Estimates */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">
-            Select tasks for PERT Analysis run by Monte Carlo Simulation
+            PERT Analysis — Monte Carlo Simulation
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {tasks.map((task) => {
-              const isSelected = selectedTasks.some(
-                (t) => t.taskName === task
-              );
-              return (
-                <label
-                  key={task}
-                  className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-all ${
-                    isSelected
-                      ? "border-blue-400/50 bg-blue-400/10 text-blue-700 dark:text-blue-300"
-                      : "border-transparent bg-muted hover:bg-muted/80"
-                  }`}
-                >
-                  <span className="capitalize">
-                    {task.split("_").join(" ")}
-                  </span>
-                  <Switch
-                    checked={isSelected}
-                    onCheckedChange={() => onTaskToggle(task)}
-                  />
-                </label>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Estimates Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Provide Estimates</CardTitle>
-        </CardHeader>
         <CardContent className="space-y-5">
-          <div className="rounded-lg border-l-4 border-blue-400 bg-blue-400/5 px-4 py-3 text-sm text-muted-foreground">
-            For every selected task, provide an estimated time. Example:{" "}
+          <div className="rounded-lg bg-blue-400/5 px-4 py-3 text-sm text-muted-foreground">
+            Select tasks below and provide an estimated time for each. Example:{" "}
             <strong className="text-foreground">
               Styling Task — 120 minutes.
             </strong>{" "}
             Pessimistic time must be greater than optimistic and most likely
             time.
           </div>
+
+          <TaskMultiSelect
+            allTasks={tasks}
+            selectedTasks={selectedTasks.map((t) => t.taskName)}
+            onToggle={onTaskToggle}
+            onSelectAll={onSelectAll}
+            onClearAll={onClearAll}
+            accentColor="blue"
+          />
 
           {selectedTasks.length > 0 && (
             <>
@@ -258,7 +245,10 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
                       angle={-45}
                       textAnchor="end"
                       height={80}
-                      tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                      tick={{
+                        fontSize: 10,
+                        fill: "hsl(var(--muted-foreground))",
+                      }}
                       label={{
                         value: "Duration Range",
                         position: "insideBottom",

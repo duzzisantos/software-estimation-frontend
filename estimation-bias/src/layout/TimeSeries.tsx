@@ -3,10 +3,10 @@ import { toast } from "sonner";
 import { TaskInput } from "../forms/FormFactory";
 import { tasks } from "../utils/data";
 import { useTimeSeriesData } from "../utils/useTimeSeriesData";
+import { TaskMultiSelect } from "@/components/task-multiselect";
 import { TaskFilter } from "@/components/task-filter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import {
   LineChart,
   Line,
@@ -48,7 +48,8 @@ const TimeSeriesAnalysis = ({
   );
 
   const filteredChartData = useMemo(() => {
-    if (!chartData.data.length) return { data: [], dateKeys: chartData.dateKeys };
+    if (!chartData.data.length)
+      return { data: [], dateKeys: chartData.dateKeys };
     const filtered = chartData.data.filter((point) => {
       const taskKey = String(point.task).split(" ").join("_");
       return visibleTasks.has(taskKey);
@@ -65,6 +66,20 @@ const TimeSeriesAnalysis = ({
         : `Removed ${taskName.split("_").join(" ")}`,
       { icon: isAdding ? "+" : "-" }
     );
+  };
+
+  const onSelectAll = () => {
+    tasks.forEach((t) => {
+      if (!selectedNewTasks.find((s) => s.taskName === t)) {
+        handleSelectedTasks(t);
+      }
+    });
+    toast.success("All tasks selected");
+  };
+
+  const onClearAll = () => {
+    setSelectedNewTasks([]);
+    toast("All tasks cleared");
   };
 
   const onRetrain = async () => {
@@ -110,49 +125,15 @@ const TimeSeriesAnalysis = ({
         </Button>
       </div>
 
-      {/* Task Selection */}
+      {/* Task Selection + Work Logs */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">
-            Select all tasks for Time Series Analysis
+            Time Series Analysis — Work Logs
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {tasks.map((task) => {
-              const isSelected = selectedNewTasks.some(
-                (t) => t.taskName === task
-              );
-              return (
-                <label
-                  key={task}
-                  className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-all ${
-                    isSelected
-                      ? "border-cyan-400/50 bg-cyan-400/10 text-cyan-700 dark:text-cyan-300"
-                      : "border-transparent bg-muted hover:bg-muted/80"
-                  }`}
-                >
-                  <span className="capitalize">
-                    {task.split("_").join(" ")}
-                  </span>
-                  <Switch
-                    checked={isSelected}
-                    onCheckedChange={() => onTaskToggle(task)}
-                  />
-                </label>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Work Logs Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Provide Work Logs</CardTitle>
-        </CardHeader>
         <CardContent className="space-y-5">
-          <div className="rounded-lg border-l-4 border-blue-400 bg-blue-400/5 px-4 py-3 text-sm text-muted-foreground">
+          <div className="rounded-lg bg-cyan-400/5 px-4 py-3 text-sm text-muted-foreground">
             <strong className="text-foreground">Select all tasks!</strong> For
             every selected task, provide an estimated time in non-decimal
             format. Example:{" "}
@@ -160,6 +141,15 @@ const TimeSeriesAnalysis = ({
               Data Backup Task — 100
             </strong>
           </div>
+
+          <TaskMultiSelect
+            allTasks={tasks}
+            selectedTasks={selectedNewTasks.map((t) => t.taskName)}
+            onToggle={onTaskToggle}
+            onSelectAll={onSelectAll}
+            onClearAll={onClearAll}
+            accentColor="cyan"
+          />
 
           {selectedNewTasks.length > 0 && (
             <>
@@ -226,7 +216,10 @@ const TimeSeriesAnalysis = ({
                   angle={-45}
                   textAnchor="end"
                   height={100}
-                  tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }}
+                  tick={{
+                    fontSize: 9,
+                    fill: "hsl(var(--muted-foreground))",
+                  }}
                 />
                 <YAxis
                   tick={{ fill: "hsl(var(--muted-foreground))" }}

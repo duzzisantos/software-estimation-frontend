@@ -35,7 +35,7 @@ const MonteCarloTable = ({ result }: Props) => {
   });
 
   return (
-    <div className="mt-4 rounded-lg border">
+    <div className="mt-4 rounded-lg">
       <Table>
         <TableHeader>
           <TableRow>

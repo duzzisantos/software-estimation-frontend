@@ -10,7 +10,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
-export function UserProfile() {
+interface UserProfileProps {
+  onLogout: () => void;
+}
+
+export function UserProfile({ onLogout }: UserProfileProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -47,7 +51,10 @@ export function UserProfile() {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onClick={() => toast("Signed out successfully")}
+          onClick={() => {
+            onLogout();
+            toast("Signed out successfully");
+          }}
           className="text-destructive focus:text-destructive"
         >
           <LogOut className="mr-2 h-4 w-4" />

@@ -230,7 +230,7 @@ const MultilinearRegression = () => {
                   <BarChart
                     data={filteredCoefficients}
                     layout="vertical"
-                    margin={{ top: 10, right: 30, bottom: 10, left: 30 }}
+                    margin={{ top: 10, right: 30, bottom: 10, left: 10 }}
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
@@ -317,6 +317,7 @@ const MultilinearRegression = () => {
                       position: "insideBottom",
                       offset: -15,
                       fill: "hsl(var(--muted-foreground))",
+                      fontSize: "11px",
                     }}
                   />
                   <YAxis
@@ -332,6 +333,7 @@ const MultilinearRegression = () => {
                       angle: -90,
                       position: "insideLeft",
                       fill: "hsl(var(--muted-foreground))",
+                      fontSize: "11px",
                     }}
                   />
                   <Tooltip
@@ -344,7 +346,7 @@ const MultilinearRegression = () => {
                       fontSize: "11px",
                     }}
                   />
-                  <Legend wrapperStyle={{ paddingTop: 10, fontSize: "11px" }} />
+                  <Legend wrapperStyle={{ paddingTop: 25, fontSize: "11px" }} />
                   <Scatter name="Samples" data={scatterData} fill="#a78bfa" />
                 </ScatterChart>
               </ResponsiveContainer>
@@ -379,6 +381,7 @@ const MultilinearRegression = () => {
                       position: "insideBottom",
                       offset: -10,
                       fill: "hsl(var(--muted-foreground))",
+                      fontSize: "11px",
                     }}
                     tick={{
                       fontSize: 11,
@@ -391,6 +394,7 @@ const MultilinearRegression = () => {
                       angle: -90,
                       position: "insideLeft",
                       fill: "hsl(var(--muted-foreground))",
+                      fontSize: "11px",
                     }}
                     tick={{
                       fontSize: 11,
@@ -452,7 +456,7 @@ const MultilinearRegression = () => {
                       </TableCell>
                       <TableCell>
                         <Badge
-                          className="rounded-0"
+                          className="rounded-none capitalize"
                           variant={
                             item.coefficient >= 0 ? "success" : "destructive"
                           }

@@ -48,7 +48,7 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
   } = usePertAnalysis(selectedTasks, setSelectedTasks);
 
   const [visibleTasks, setVisibleTasks] = useState<Set<string>>(
-    () => new Set(tasks)
+    () => new Set(tasks),
   );
 
   const filteredChartData = useMemo(() => chartData, [chartData]);
@@ -60,7 +60,7 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
       isAdding
         ? `Added ${taskName.split("_").join(" ")}`
         : `Removed ${taskName.split("_").join(" ")}`,
-      { icon: isAdding ? "+" : "-" }
+      { icon: isAdding ? "+" : "-" },
     );
   };
 
@@ -84,9 +84,7 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
       return;
     }
     if (pessimistic <= totalMostLikelyTime) {
-      toast.warning(
-        "Pessimistic time should be greater than most likely time"
-      );
+      toast.warning("Pessimistic time should be greater than most likely time");
     }
     try {
       await handleSubmit();
@@ -231,7 +229,7 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
 
             <TabsContent value="chart">
               {filteredChartData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={460}>
+                <ResponsiveContainer width="100%" height={490}>
                   <BarChart
                     data={filteredChartData}
                     margin={{ top: 20, right: 20, bottom: 60, left: 20 }}
@@ -254,6 +252,7 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
                         position: "insideBottom",
                         offset: -50,
                         fill: "hsl(var(--muted-foreground))",
+                        fontSize: "11px",
                       }}
                     />
                     <YAxis
@@ -263,6 +262,7 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
                         angle: -90,
                         position: "insideLeft",
                         fill: "hsl(var(--muted-foreground))",
+                        fontSize: "11px",
                       }}
                     />
                     <Tooltip

@@ -18,13 +18,16 @@ export function UserProfile({ onLogout }: UserProfileProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 rounded-lg px-2 py-1 transition-colors hover:bg-accent focus:outline-none">
+        <button className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors hover:bg-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
           <Avatar>
             <AvatarFallback>HW</AvatarFallback>
           </Avatar>
-          <span className="hidden text-sm font-medium md:inline-block">
-            Harry West
-          </span>
+          <div className="hidden text-left md:block">
+            <p className="text-sm font-medium leading-none">Harry West</p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              Engineer
+            </p>
+          </div>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">

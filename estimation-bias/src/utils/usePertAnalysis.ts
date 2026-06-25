@@ -1,10 +1,6 @@
 import { useState, useMemo, useCallback, Dispatch, SetStateAction } from "react";
+import { Task } from "@/types";
 import fetchPertData from "./fetchPertData";
-
-interface Task {
-  taskName: string;
-  timeEstimate: number;
-}
 
 export interface Results {
   simulated_operations: number[];
@@ -20,13 +16,11 @@ export interface Results {
 
 export function usePertAnalysis(
   selectedTasks: Task[],
-  setSelectedTasks: Dispatch<SetStateAction<Task[]>>
+  setSelectedTasks: Dispatch<SetStateAction<Task[]>>,
 ) {
   const [optimistic, setOptimistic] = useState(0.0);
   const [pessimistic, setPessimistic] = useState(0.0);
   const [results, setResults] = useState<Results>();
-  const [apiResponse, setApiResponse] = useState<number>(0);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const chartData = useMemo(() => {
     if (!results?.simulated_operations) return [];
@@ -51,7 +45,7 @@ export function usePertAnalysis(
 
   const totalMostLikelyTime = useMemo(
     () => selectedTasks.reduce((acc, t) => acc + t.timeEstimate, 0),
-    [selectedTasks]
+    [selectedTasks],
   );
 
   const handleSelectedTasks = useCallback(
@@ -62,33 +56,27 @@ export function usePertAnalysis(
         return [...prev, { taskName: newTaskName, timeEstimate: 0.0 }];
       });
     },
-    [setSelectedTasks]
+    [setSelectedTasks],
   );
 
   const updateTaskTime = useCallback(
     (taskName: string, newTimeEstimate: number) => {
       setSelectedTasks((prev) =>
         prev.map((t) =>
-          t.taskName === taskName ? { ...t, timeEstimate: newTimeEstimate } : t
-        )
+          t.taskName === taskName ? { ...t, timeEstimate: newTimeEstimate } : t,
+        ),
       );
     },
-    [setSelectedTasks]
+    [setSelectedTasks],
   );
 
   const handleSubmit = useCallback(async () => {
-    setHasSubmitted(true);
-    try {
-      const res = await fetchPertData({
-        optimistic,
-        most_likely: totalMostLikelyTime,
-        pessimistic,
-      });
-      setApiResponse(res?.status ?? 200);
-      setResults(res);
-    } catch (err) {
-      console.log(err);
-    }
+    const res = await fetchPertData({
+      optimistic,
+      most_likely: totalMostLikelyTime,
+      pessimistic,
+    });
+    setResults(res);
   }, [optimistic, pessimistic, totalMostLikelyTime]);
 
   return {
@@ -97,8 +85,6 @@ export function usePertAnalysis(
     pessimistic,
     setPessimistic,
     results,
-    apiResponse,
-    hasSubmitted,
     chartData,
     totalMostLikelyTime,
     handleSelectedTasks,

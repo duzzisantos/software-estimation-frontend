@@ -1,12 +1,8 @@
 import { useEffect, useState, useCallback, useMemo, Dispatch, SetStateAction } from "react";
+import { Task } from "@/types";
 import createWorkLogs from "./fetchTimeSeriesData";
 import { fetchDataTraining, storeDataTraining } from "./fetchDataTraining";
 import formatDate from "./formatDate";
-
-interface Task {
-  taskName: string;
-  timeEstimate: number;
-}
 
 interface ResponseData {
   training_date: string;
@@ -16,7 +12,7 @@ interface ResponseData {
 
 export function useTimeSeriesData(
   selectedNewTasks: Task[],
-  setSelectedNewTasks: Dispatch<SetStateAction<Task[]>>
+  setSelectedNewTasks: Dispatch<SetStateAction<Task[]>>,
 ) {
   const [responseData, setResponseData] = useState<ResponseData[]>([]);
   const url = import.meta.env.VITE_API_URL_TRAINING;
@@ -45,18 +41,18 @@ export function useTimeSeriesData(
         return [...prev, { taskName: newTaskName, timeEstimate: 0.0 }];
       });
     },
-    [setSelectedNewTasks]
+    [setSelectedNewTasks],
   );
 
   const updateTaskTime = useCallback(
     (taskName: string, newTimeEstimate: number) => {
       setSelectedNewTasks((prev) =>
         prev.map((t) =>
-          t.taskName === taskName ? { ...t, timeEstimate: newTimeEstimate } : t
-        )
+          t.taskName === taskName ? { ...t, timeEstimate: newTimeEstimate } : t,
+        ),
       );
     },
-    [setSelectedNewTasks]
+    [setSelectedNewTasks],
   );
 
   const handleSubmitTasks = useCallback(async () => {
@@ -67,30 +63,15 @@ export function useTimeSeriesData(
     selectedNewTasks.forEach((t) => {
       obj[t.taskName] = t.timeEstimate;
     });
-    try {
-      const res = await createWorkLogs(obj);
-      console.log(res);
-    } catch (err) {
-      console.warn(err);
-    }
+    await createWorkLogs(obj);
   }, [selectedNewTasks]);
 
   const handleRetrainData = useCallback(async () => {
-    try {
-      const res = await fetchDataTraining();
-      console.log(res.status);
-    } catch (err) {
-      console.error(err);
-    }
+    await fetchDataTraining();
   }, []);
 
   const handleStoreData = useCallback(async () => {
-    try {
-      const res = await storeDataTraining();
-      console.log(res.status);
-    } catch (err) {
-      console.error(err);
-    }
+    await storeDataTraining();
   }, []);
 
   const chartData = useMemo(() => {
@@ -110,7 +91,7 @@ export function useTimeSeriesData(
     });
 
     const dateKeys = recent.map((entry) =>
-      new Date(entry.training_date).toLocaleDateString()
+      new Date(entry.training_date).toLocaleDateString(),
     );
 
     return { data, dateKeys };

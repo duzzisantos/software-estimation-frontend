@@ -1,11 +1,17 @@
-import { Dispatch, SetStateAction, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useMemo } from "react";
 import { toast } from "sonner";
+import { BarChart3 } from "lucide-react";
+import { Task, formatTaskName } from "@/types";
+import { useTaskSelection } from "@/hooks/useTaskSelection";
 import { TaskInput } from "../forms/FormFactory";
 import { tasks } from "../utils/data";
 import { usePertAnalysis } from "../utils/usePertAnalysis";
 import MonteCarloTable from "../tables/MonteCarloTable";
 import { TaskMultiSelect } from "@/components/task-multiselect";
 import { TaskFilter } from "@/components/task-filter";
+import { InfoBanner } from "@/components/info-banner";
+import { AnalysisCard } from "@/components/analysis-card";
+import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,12 +27,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { TOOLTIP_STYLE, AXIS_TICK, AXIS_LABEL_STYLE, GRID_STROKE } from "../utils/chartConfig";
 import { PALETTE } from "../utils/generateRandomColors";
-
-interface Task {
-  taskName: string;
-  timeEstimate: number;
-}
 
 interface FormSelection {
   selectedTasks: Task[];
@@ -42,41 +44,21 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
     results,
     chartData,
     totalMostLikelyTime,
-    handleSelectedTasks,
     updateTaskTime,
     handleSubmit,
   } = usePertAnalysis(selectedTasks, setSelectedTasks);
 
-  const [visibleTasks, setVisibleTasks] = useState<Set<string>>(
-    () => new Set(tasks),
-  );
+  const {
+    visibleTasks,
+    onTaskToggle,
+    onSelectAll,
+    onClearAll,
+    toggleVisibility,
+    showAllVisible,
+    hideAllVisible,
+  } = useTaskSelection({ selectedTasks, setSelectedTasks });
 
   const filteredChartData = useMemo(() => chartData, [chartData]);
-
-  const onTaskToggle = (taskName: string) => {
-    handleSelectedTasks(taskName);
-    const isAdding = !selectedTasks.find((t) => t.taskName === taskName);
-    toast(
-      isAdding
-        ? `Added ${taskName.split("_").join(" ")}`
-        : `Removed ${taskName.split("_").join(" ")}`,
-      { icon: isAdding ? "+" : "-" },
-    );
-  };
-
-  const onSelectAll = () => {
-    tasks.forEach((t) => {
-      if (!selectedTasks.find((s) => s.taskName === t)) {
-        handleSelectedTasks(t);
-      }
-    });
-    toast.success("All tasks selected");
-  };
-
-  const onClearAll = () => {
-    setSelectedTasks([]);
-    toast("All tasks cleared");
-  };
 
   const onSubmit = async () => {
     if (optimistic <= 0 || pessimistic <= 0) {
@@ -100,22 +82,19 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
 
   return (
     <div className="space-y-6">
-      {/* Task Selection + Estimates */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">
-            PERT Analysis — Monte Carlo Simulation
-          </CardTitle>
+          <CardTitle>PERT Analysis — Monte Carlo Simulation</CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
-          <div className="rounded-lg bg-blue-400/5 px-4 py-3 text-sm text-muted-foreground">
+          <InfoBanner>
             Select tasks below and provide an estimated time for each. Example:{" "}
             <strong className="text-foreground">
               Styling Task — 120 minutes.
             </strong>{" "}
             Pessimistic time must be greater than optimistic and most likely
             time.
-          </div>
+          </InfoBanner>
 
           <TaskMultiSelect
             allTasks={tasks}
@@ -132,7 +111,7 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
                 {selectedTasks.map((task, index) => (
                   <TaskInput
                     key={index}
-                    taskName={task.taskName.split("_").join(" ")}
+                    taskName={formatTaskName(task.taskName)}
                     taskValue={task.timeEstimate}
                     setTaskValue={(newValue: number) =>
                       updateTaskTime(task.taskName, newValue)
@@ -141,7 +120,7 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
                 ))}
               </div>
 
-              <div className="border-t pt-5">
+              <div className="border-t border-border/40 pt-5">
                 <div className="flex flex-wrap items-end gap-6">
                   <div className="space-y-2">
                     <Label>
@@ -156,7 +135,7 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
                       onChange={(e) =>
                         setOptimistic(parseFloat(e.target.value) || 0)
                       }
-                      className="w-52"
+                      className="w-52 tabular-nums"
                     />
                   </div>
                   <div className="space-y-2">
@@ -172,7 +151,7 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
                       onChange={(e) =>
                         setPessimistic(parseFloat(e.target.value) || 0)
                       }
-                      className="w-52"
+                      className="w-52 tabular-nums"
                     />
                   </div>
                 </div>
@@ -199,107 +178,82 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
         </CardContent>
       </Card>
 
-      {/* Results */}
-      <Card>
-        <CardHeader className="flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-base">
-            Estimation Analysis Result
-          </CardTitle>
+      <AnalysisCard
+        title="Estimation Analysis Result"
+        action={
           <TaskFilter
             tasks={tasks}
             visibleTasks={visibleTasks}
-            onToggle={(t) =>
-              setVisibleTasks((prev) => {
-                const next = new Set(prev);
-                if (next.has(t)) next.delete(t);
-                else next.add(t);
-                return next;
-              })
-            }
-            onShowAll={() => setVisibleTasks(new Set(tasks))}
-            onHideAll={() => setVisibleTasks(new Set())}
+            onToggle={toggleVisibility}
+            onShowAll={showAllVisible}
+            onHideAll={hideAllVisible}
           />
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="table">
-            <TabsList>
-              <TabsTrigger value="chart">Distribution Chart</TabsTrigger>
-              <TabsTrigger value="table">Result Table</TabsTrigger>
-            </TabsList>
+        }
+      >
+        <Tabs defaultValue="table">
+          <TabsList>
+            <TabsTrigger value="chart">Distribution Chart</TabsTrigger>
+            <TabsTrigger value="table">Result Table</TabsTrigger>
+          </TabsList>
 
-            <TabsContent value="chart">
-              {filteredChartData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={490}>
-                  <BarChart
-                    data={filteredChartData}
-                    margin={{ top: 20, right: 20, bottom: 60, left: 20 }}
-                  >
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="hsl(var(--border))"
-                    />
-                    <XAxis
-                      dataKey="range"
-                      angle={-45}
-                      textAnchor="end"
-                      height={80}
-                      tick={{
-                        fontSize: 10,
-                        fill: "hsl(var(--muted-foreground))",
-                      }}
-                      label={{
-                        value: "Duration Range",
-                        position: "insideBottom",
-                        offset: -50,
-                        fill: "hsl(var(--muted-foreground))",
-                        fontSize: "11px",
-                      }}
-                    />
-                    <YAxis
-                      tick={{ fill: "hsl(var(--muted-foreground))" }}
-                      label={{
-                        value: "Frequency",
-                        angle: -90,
-                        position: "insideLeft",
-                        fill: "hsl(var(--muted-foreground))",
-                        fontSize: "11px",
-                      }}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        borderRadius: 10,
-                        border: "1px solid hsl(var(--border))",
-                        background: "hsl(var(--popover))",
-                        color: "hsl(var(--popover-foreground))",
-                      }}
-                      formatter={(value) => [String(value), "Simulations"]}
-                    />
-                    <Bar
-                      dataKey="count"
-                      fill={PALETTE[3]}
-                      radius={[4, 4, 0, 0]}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
-                  Run a simulation to see the distribution chart
-                </div>
-              )}
-            </TabsContent>
+          <TabsContent value="chart">
+            {filteredChartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={490}>
+                <BarChart
+                  data={filteredChartData}
+                  margin={{ top: 20, right: 20, bottom: 60, left: 20 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
+                  <XAxis
+                    dataKey="range"
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                    tick={{ ...AXIS_TICK, fontSize: 10 }}
+                    label={{
+                      value: "Duration Range",
+                      position: "insideBottom",
+                      offset: -50,
+                      ...AXIS_LABEL_STYLE,
+                    }}
+                  />
+                  <YAxis
+                    tick={AXIS_TICK}
+                    label={{
+                      value: "Frequency",
+                      angle: -90,
+                      position: "insideLeft",
+                      ...AXIS_LABEL_STYLE,
+                    }}
+                  />
+                  <Tooltip
+                    contentStyle={TOOLTIP_STYLE}
+                    formatter={(value) => [String(value), "Simulations"]}
+                  />
+                  <Bar
+                    dataKey="count"
+                    fill={PALETTE[3]}
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <EmptyState
+                icon={BarChart3}
+                title="Run a simulation to see the distribution chart"
+              />
+            )}
+          </TabsContent>
 
-            <TabsContent value="table">
-              {results !== undefined ? (
-                <MonteCarloTable result={results} />
-              ) : (
-                <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
-                  No results to show yet
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+          <TabsContent value="table">
+            {results !== undefined ? (
+              <MonteCarloTable result={results} />
+            ) : (
+              <EmptyState title="No results to show yet" description="Submit estimates to generate a Monte Carlo simulation" />
+            )}
+          </TabsContent>
+        </Tabs>
+      </AnalysisCard>
     </div>
   );
 };

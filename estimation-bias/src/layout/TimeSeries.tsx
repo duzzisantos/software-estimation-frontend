@@ -1,10 +1,16 @@
-import { Dispatch, SetStateAction, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useMemo } from "react";
 import { toast } from "sonner";
+import { TrendingUp } from "lucide-react";
+import { Task, formatTaskName } from "@/types";
+import { useTaskSelection } from "@/hooks/useTaskSelection";
 import { TaskInput } from "../forms/FormFactory";
 import { tasks } from "../utils/data";
 import { useTimeSeriesData } from "../utils/useTimeSeriesData";
 import { TaskMultiSelect } from "@/components/task-multiselect";
 import { TaskFilter } from "@/components/task-filter";
+import { InfoBanner } from "@/components/info-banner";
+import { AnalysisCard } from "@/components/analysis-card";
+import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -17,12 +23,8 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { TOOLTIP_STYLE, AXIS_TICK, AXIS_LABEL_STYLE, GRID_STROKE } from "../utils/chartConfig";
 import { PALETTE } from "../utils/generateRandomColors";
-
-interface Task {
-  taskName: string;
-  timeEstimate: number;
-}
 
 interface FormSelection {
   selectedNewTasks: Task[];
@@ -36,16 +38,24 @@ const TimeSeriesAnalysis = ({
   const {
     responseData,
     chartData,
-    handleSelectedTasks,
     updateTaskTime,
     handleSubmitTasks,
     handleRetrainData,
     handleStoreData,
   } = useTimeSeriesData(selectedNewTasks, setSelectedNewTasks);
 
-  const [visibleTasks, setVisibleTasks] = useState<Set<string>>(
-    () => new Set(tasks),
-  );
+  const {
+    visibleTasks,
+    onTaskToggle,
+    onSelectAll,
+    onClearAll,
+    toggleVisibility,
+    showAllVisible,
+    hideAllVisible,
+  } = useTaskSelection({
+    selectedTasks: selectedNewTasks,
+    setSelectedTasks: setSelectedNewTasks,
+  });
 
   const filteredChartData = useMemo(() => {
     if (!chartData.data.length)
@@ -56,31 +66,6 @@ const TimeSeriesAnalysis = ({
     });
     return { data: filtered, dateKeys: chartData.dateKeys };
   }, [chartData, visibleTasks]);
-
-  const onTaskToggle = (taskName: string) => {
-    handleSelectedTasks(taskName);
-    const isAdding = !selectedNewTasks.find((t) => t.taskName === taskName);
-    toast(
-      isAdding
-        ? `Added ${taskName.split("_").join(" ")}`
-        : `Removed ${taskName.split("_").join(" ")}`,
-      { icon: isAdding ? "+" : "-" },
-    );
-  };
-
-  const onSelectAll = () => {
-    tasks.forEach((t) => {
-      if (!selectedNewTasks.find((s) => s.taskName === t)) {
-        handleSelectedTasks(t);
-      }
-    });
-    toast.success("All tasks selected");
-  };
-
-  const onClearAll = () => {
-    setSelectedNewTasks([]);
-    toast("All tasks cleared");
-  };
 
   const onRetrain = async () => {
     try {
@@ -115,7 +100,6 @@ const TimeSeriesAnalysis = ({
 
   return (
     <div className="space-y-6">
-      {/* Action Buttons */}
       <div className="flex gap-2">
         <Button size="sm" onClick={onRetrain}>
           Retrain Data
@@ -125,20 +109,17 @@ const TimeSeriesAnalysis = ({
         </Button>
       </div>
 
-      {/* Task Selection + Work Logs */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">
-            Time Series Analysis — Work Logs
-          </CardTitle>
+          <CardTitle>Time Series Analysis — Work Logs</CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
-          <div className="rounded-lg bg-cyan-400/5 px-4 py-3 text-sm text-muted-foreground">
+          <InfoBanner variant="cyan">
             <strong className="text-foreground">Select all tasks!</strong> For
             every selected task, provide an estimated time in non-decimal
             format. Example:{" "}
             <strong className="text-foreground">Data Backup Task — 100</strong>
-          </div>
+          </InfoBanner>
 
           <TaskMultiSelect
             allTasks={tasks}
@@ -155,7 +136,7 @@ const TimeSeriesAnalysis = ({
                 {selectedNewTasks.map((task, index) => (
                   <TaskInput
                     key={index}
-                    taskName={task.taskName.split("_").join(" ")}
+                    taskName={formatTaskName(task.taskName)}
                     taskValue={task.timeEstimate}
                     setTaskValue={(newValue: number) =>
                       updateTaskTime(task.taskName, newValue)
@@ -171,95 +152,70 @@ const TimeSeriesAnalysis = ({
         </CardContent>
       </Card>
 
-      {/* Results Chart */}
-      <Card>
-        <CardHeader className="flex-row items-center justify-between space-y-0">
-          <div>
-            <CardTitle className="text-base">
-              Estimation Result Analysis
-            </CardTitle>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Predicted durations across {responseData.length} training periods
-              — last 6 shown
-            </p>
-          </div>
+      <AnalysisCard
+        title="Estimation Result Analysis"
+        description={`Predicted durations across ${responseData.length} training periods — last 6 shown`}
+        action={
           <TaskFilter
             tasks={tasks}
             visibleTasks={visibleTasks}
-            onToggle={(t) =>
-              setVisibleTasks((prev) => {
-                const next = new Set(prev);
-                if (next.has(t)) next.delete(t);
-                else next.add(t);
-                return next;
-              })
-            }
-            onShowAll={() => setVisibleTasks(new Set(tasks))}
-            onHideAll={() => setVisibleTasks(new Set())}
+            onToggle={toggleVisibility}
+            onShowAll={showAllVisible}
+            onHideAll={hideAllVisible}
           />
-        </CardHeader>
-        <CardContent className="mt-5">
-          {filteredChartData.data.length > 0 ? (
-            <ResponsiveContainer width="100%" height={450}>
-              <LineChart
-                data={filteredChartData.data}
-                margin={{ top: 10, right: 20, bottom: 80, left: 20 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="hsl(var(--border))"
+        }
+      >
+        {filteredChartData.data.length > 0 ? (
+          <ResponsiveContainer width="100%" height={450}>
+            <LineChart
+              data={filteredChartData.data}
+              margin={{ top: 10, right: 20, bottom: 80, left: 20 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
+              <XAxis
+                dataKey="task"
+                angle={-45}
+                textAnchor="end"
+                height={100}
+                tick={{ ...AXIS_TICK, fontSize: 10 }}
+              />
+              <YAxis
+                tick={AXIS_TICK}
+                label={{
+                  value: "Predicted Duration",
+                  angle: -90,
+                  position: "insideLeft",
+                  ...AXIS_LABEL_STYLE,
+                }}
+              />
+              <Tooltip
+                contentStyle={{
+                  ...TOOLTIP_STYLE,
+                  textTransform: "capitalize",
+                }}
+              />
+              <Legend wrapperStyle={{ paddingTop: 10, fontSize: "11px" }} />
+              {filteredChartData.dateKeys.map((key, idx) => (
+                <Line
+                  key={key}
+                  type="monotone"
+                  dataKey={key}
+                  stroke={PALETTE[idx % PALETTE.length]}
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 5 }}
                 />
-                <XAxis
-                  dataKey="task"
-                  angle={-45}
-                  textAnchor="end"
-                  height={100}
-                  tick={{
-                    fontSize: 10,
-                    fill: "hsl(var(--muted-foreground))",
-                  }}
-                />
-                <YAxis
-                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
-                  label={{
-                    value: "Predicted Duration",
-                    angle: -90,
-                    position: "insideLeft",
-                    fill: "hsl(var(--muted-foreground))",
-                    fontSize: "11px",
-                  }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: 10,
-                    border: "1px solid hsl(var(--border))",
-                    background: "hsl(var(--popover))",
-                    color: "hsl(var(--popover-foreground))",
-                    textTransform: "capitalize",
-                    fontSize: "11px",
-                  }}
-                />
-                <Legend wrapperStyle={{ paddingTop: 10, fontSize: "11px" }} />
-                {filteredChartData.dateKeys.map((key, idx) => (
-                  <Line
-                    key={key}
-                    type="monotone"
-                    dataKey={key}
-                    stroke={PALETTE[idx % PALETTE.length]}
-                    strokeWidth={2}
-                    dot={{ r: 3 }}
-                    activeDot={{ r: 5 }}
-                  />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
-              No training data available yet
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <EmptyState
+            icon={TrendingUp}
+            title="No training data available yet"
+            description="Retrain the model to generate predictions"
+          />
+        )}
+      </AnalysisCard>
     </div>
   );
 };

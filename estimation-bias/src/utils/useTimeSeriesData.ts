@@ -13,6 +13,7 @@ interface ResponseData {
 export function useTimeSeriesData(
   selectedNewTasks: Task[],
   setSelectedNewTasks: Dispatch<SetStateAction<Task[]>>,
+  userName: string,
 ) {
   const [responseData, setResponseData] = useState<ResponseData[]>([]);
   const url = import.meta.env.VITE_API_URL_TRAINING;
@@ -58,7 +59,7 @@ export function useTimeSeriesData(
   const handleSubmitTasks = useCallback(async () => {
     const obj: Record<string, number | string> = {
       last_updated: formatDate(),
-      submitted_by: "Harry West",
+      submitted_by: userName,
     };
     selectedNewTasks.forEach((t) => {
       obj[t.taskName] = t.timeEstimate;

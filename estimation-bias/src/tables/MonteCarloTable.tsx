@@ -35,7 +35,7 @@ const MonteCarloTable = ({ result }: Props) => {
   });
 
   return (
-    <div className="mt-4 rounded-lg">
+    <div className="mt-4">
       <Table>
         <TableHeader>
           <TableRow>
@@ -49,7 +49,7 @@ const MonteCarloTable = ({ result }: Props) => {
         <TableBody>
           <TableRow>
             {values.map((v, i) => (
-              <TableCell key={i} className="font-mono text-sm">
+              <TableCell key={i} className="font-mono text-[13px] tabular-nums">
                 {v}
               </TableCell>
             ))}

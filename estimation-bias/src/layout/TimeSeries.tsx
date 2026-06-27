@@ -23,17 +23,24 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { TOOLTIP_STYLE, AXIS_TICK, AXIS_LABEL_STYLE, GRID_STROKE } from "../utils/chartConfig";
+import {
+  TOOLTIP_STYLE,
+  AXIS_TICK,
+  AXIS_LABEL_STYLE,
+  GRID_STROKE,
+} from "../utils/chartConfig";
 import { PALETTE } from "../utils/generateRandomColors";
 
 interface FormSelection {
   selectedNewTasks: Task[];
   setSelectedNewTasks: Dispatch<SetStateAction<Task[]>>;
+  userName: string;
 }
 
 const TimeSeriesAnalysis = ({
   selectedNewTasks,
   setSelectedNewTasks,
+  userName,
 }: FormSelection) => {
   const {
     responseData,
@@ -42,7 +49,7 @@ const TimeSeriesAnalysis = ({
     handleSubmitTasks,
     handleRetrainData,
     handleStoreData,
-  } = useTimeSeriesData(selectedNewTasks, setSelectedNewTasks);
+  } = useTimeSeriesData(selectedNewTasks, setSelectedNewTasks, userName);
 
   const {
     visibleTasks,
@@ -116,8 +123,8 @@ const TimeSeriesAnalysis = ({
         <CardContent className="space-y-5">
           <InfoBanner variant="cyan">
             <strong className="text-foreground">Select all tasks!</strong> For
-            every selected task, provide an estimated time in non-decimal
-            format. Example:{" "}
+            every selected task, provide an estimated time in non-decimal format.
+            Example:{" "}
             <strong className="text-foreground">Data Backup Task — 100</strong>
           </InfoBanner>
 
@@ -211,7 +218,7 @@ const TimeSeriesAnalysis = ({
         ) : (
           <EmptyState
             icon={TrendingUp}
-            title="No training data available yet"
+            title="No training data available"
             description="Retrain the model to generate predictions"
           />
         )}

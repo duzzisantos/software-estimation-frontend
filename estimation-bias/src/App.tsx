@@ -14,7 +14,7 @@ import TimeSeriesAnalysis from "./layout/TimeSeries";
 import MultilinearRegression from "./layout/MultilinearRegression";
 
 function App() {
-  const { authenticated, loading, login, logout } = useAuth();
+  const { authenticated, loading, userName, login, logout } = useAuth();
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
   const [selectedNewTasks, setSelectedNewsTasks] = useState<Task[]>([]);
 
@@ -24,17 +24,17 @@ function App() {
         <LoginPage loading={loading} onLogin={login} />
       ) : (
         <div className="min-h-screen bg-background">
-          <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl">
+          <header className="glass-subtle sticky top-0 z-50 w-full border-b-0">
             <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
               <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary shadow-sm">
+                <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-primary shadow-sm shadow-primary/20">
                   <Activity
                     className="h-4 w-4 text-primary-foreground"
-                    strokeWidth={2.5}
+                    strokeWidth={2}
                   />
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-base font-bold tracking-tight">
+                  <span className="text-[15px] font-bold tracking-tight">
                     SPE
                   </span>
                   <span className="hidden text-xs font-medium text-muted-foreground sm:inline">
@@ -45,8 +45,8 @@ function App() {
 
               <div className="flex items-center gap-1">
                 <ThemeToggle />
-                <Separator orientation="vertical" className="mx-2 h-5" />
-                <UserProfile onLogout={logout} />
+                <Separator orientation="vertical" className="mx-2 h-5 bg-border/40" />
+                <UserProfile userName={userName} onLogout={logout} />
               </div>
             </div>
           </header>
@@ -54,9 +54,9 @@ function App() {
           <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
             <div className="mb-8">
               <h1 className="text-2xl font-bold tracking-tight">
-                Estimation Dashboard
+                {userName ? `Welcome, ${userName.split(" ")[0]}` : "Estimation Dashboard"}
               </h1>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="mt-1.5 text-[13px] text-muted-foreground">
                 Analyze and predict software project timelines using statistical
                 models
               </p>
@@ -87,6 +87,7 @@ function App() {
                 <TimeSeriesAnalysis
                   setSelectedNewTasks={setSelectedNewsTasks}
                   selectedNewTasks={selectedNewTasks}
+                  userName={userName}
                 />
               </TabsContent>
 

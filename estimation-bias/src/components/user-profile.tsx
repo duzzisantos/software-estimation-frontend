@@ -11,19 +11,32 @@ import {
 import { toast } from "sonner";
 
 interface UserProfileProps {
+  userName: string;
   onLogout: () => void;
 }
 
-export function UserProfile({ onLogout }: UserProfileProps) {
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
+
+export function UserProfile({ userName, onLogout }: UserProfileProps) {
+  const initials = getInitials(userName);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors hover:bg-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
           <Avatar>
-            <AvatarFallback>HW</AvatarFallback>
+            <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
           <div className="hidden text-left md:block">
-            <p className="text-sm font-medium leading-none">Harry West</p>
+            <p className="text-sm font-medium leading-none">{userName}</p>
             <p className="mt-0.5 text-[11px] text-muted-foreground">
               Engineer
             </p>
@@ -33,9 +46,9 @@ export function UserProfile({ onLogout }: UserProfileProps) {
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium">Harry West</p>
+            <p className="text-sm font-medium">{userName}</p>
             <p className="text-xs text-muted-foreground">
-              h.west@microsoft.com
+              Signed in
             </p>
           </div>
         </DropdownMenuLabel>

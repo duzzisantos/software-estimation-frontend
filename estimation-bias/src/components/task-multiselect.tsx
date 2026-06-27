@@ -69,7 +69,7 @@ export function TaskMultiSelect({
       </Button>
 
       {open && (
-        <div className="absolute left-0 top-full z-50 mt-2 w-full rounded-xl border border-border/60 bg-popover p-4 shadow-lg animate-scale-in sm:w-80">
+        <div className="absolute left-0 top-full z-50 mt-2 w-full glass-strong rounded-2xl p-4 animate-scale-in sm:w-80">
           <div className="mb-3 flex items-center justify-between">
             <h4 className="text-sm font-semibold">Tasks</h4>
             <div className="flex gap-1">

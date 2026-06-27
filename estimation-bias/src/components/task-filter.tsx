@@ -49,7 +49,7 @@ export function TaskFilter({
       </Button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-72 rounded-xl border border-border/60 bg-popover p-4 shadow-lg animate-scale-in">
+        <div className="absolute right-0 top-full z-50 mt-2 w-72 glass-strong rounded-2xl p-4 animate-scale-in">
           <div className="mb-3 flex items-center justify-between">
             <h4 className="text-sm font-semibold">Visible Tasks</h4>
             <div className="flex gap-1">

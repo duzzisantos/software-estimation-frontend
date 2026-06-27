@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface AnalysisCardProps {
   title: string;
@@ -6,6 +7,7 @@ interface AnalysisCardProps {
   action?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
+  compact?: boolean;
 }
 
 export function AnalysisCard({
@@ -14,9 +16,10 @@ export function AnalysisCard({
   action,
   children,
   className,
+  compact,
 }: AnalysisCardProps) {
   return (
-    <Card className={className}>
+    <Card className={cn(compact && "overflow-hidden", className)}>
       <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
         <div className="min-w-0 flex-1">
           <CardTitle>{title}</CardTitle>
@@ -28,7 +31,9 @@ export function AnalysisCard({
         </div>
         {action && <div className="shrink-0">{action}</div>}
       </CardHeader>
-      <CardContent>{children}</CardContent>
+      <CardContent className={cn(compact && "px-4 pb-4")}>
+        {children}
+      </CardContent>
     </Card>
   );
 }

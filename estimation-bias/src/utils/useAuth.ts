@@ -12,22 +12,29 @@ async function sha256(message: string): Promise<string> {
   return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-function isSessionValid(): boolean {
+interface SessionData {
+  authenticated: boolean;
+  ts: number;
+  userName: string;
+}
+
+function getSession(): SessionData | null {
   const session = sessionStorage.getItem(SESSION_KEY);
-  if (!session) return false;
+  if (!session) return null;
   try {
     const parsed = JSON.parse(session);
-    return parsed.authenticated === true && typeof parsed.ts === "number";
+    if (parsed.authenticated === true && typeof parsed.ts === "number") {
+      return parsed as SessionData;
+    }
+    return null;
   } catch {
-    return false;
+    return null;
   }
 }
 
-function persistSession() {
-  sessionStorage.setItem(
-    SESSION_KEY,
-    JSON.stringify({ authenticated: true, ts: Date.now() }),
-  );
+function persistSession(userName: string) {
+  const data: SessionData = { authenticated: true, ts: Date.now(), userName };
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify(data));
 }
 
 function clearSession() {
@@ -35,11 +42,18 @@ function clearSession() {
 }
 
 export function useAuth() {
-  const [authenticated, setAuthenticated] = useState(isSessionValid);
+  const [session, setSession] = useState(getSession);
   const [loading, setLoading] = useState(false);
 
+  const authenticated = session?.authenticated === true;
+  const userName = session?.userName ?? "";
+
   const login = useCallback(
-    async (apiKey: string, unlockKey: string): Promise<boolean> => {
+    async (
+      name: string,
+      apiKey: string,
+      unlockKey: string,
+    ): Promise<boolean> => {
       setLoading(true);
       try {
         const [apiHash, unlockHash] = await Promise.all([
@@ -48,8 +62,8 @@ export function useAuth() {
         ]);
 
         if (apiHash === API_KEY_HASH && unlockHash === UNLOCK_KEY_HASH) {
-          persistSession();
-          setAuthenticated(true);
+          persistSession(name);
+          setSession(getSession());
           return true;
         }
         return false;
@@ -62,8 +76,8 @@ export function useAuth() {
 
   const logout = useCallback(() => {
     clearSession();
-    setAuthenticated(false);
+    setSession(null);
   }, []);
 
-  return { authenticated, loading, login, logout };
+  return { authenticated, loading, userName, login, logout };
 }

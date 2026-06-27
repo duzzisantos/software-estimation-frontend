@@ -6,18 +6,24 @@ interface InfoBannerProps {
 }
 
 const variantStyles = {
-  blue: "border-blue-200 bg-blue-50/50 dark:border-blue-500/20 dark:bg-blue-500/5",
-  cyan: "border-cyan-200 bg-cyan-50/50 dark:border-cyan-500/20 dark:bg-cyan-500/5",
+  blue: "bg-blue-500/5 border-blue-500/10 dark:bg-blue-400/5 dark:border-blue-400/10",
+  cyan: "bg-cyan-500/5 border-cyan-500/10 dark:bg-cyan-400/5 dark:border-cyan-400/10",
   amber:
-    "border-amber-200 bg-amber-50/50 dark:border-amber-500/20 dark:bg-amber-500/5",
+    "bg-amber-500/5 border-amber-500/10 dark:bg-amber-400/5 dark:border-amber-400/10",
+};
+
+const iconStyles = {
+  blue: "text-blue-500/60 dark:text-blue-400/60",
+  cyan: "text-cyan-500/60 dark:text-cyan-400/60",
+  amber: "text-amber-500/60 dark:text-amber-400/60",
 };
 
 export function InfoBanner({ children, variant = "blue" }: InfoBannerProps) {
   return (
     <div
-      className={`flex items-start gap-3 rounded-lg border px-4 py-3 text-sm text-muted-foreground ${variantStyles[variant]}`}
+      className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-[13px] leading-relaxed text-muted-foreground ${variantStyles[variant]}`}
     >
-      <Info className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground/70" />
+      <Info className={`mt-0.5 h-4 w-4 shrink-0 ${iconStyles[variant]}`} />
       <div>{children}</div>
     </div>
   );

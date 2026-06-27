@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useMemo } from "react";
 import { toast } from "sonner";
-import { BarChart3 } from "lucide-react";
+import { BarChart3, TableIcon } from "lucide-react";
 import { Task, formatTaskName } from "@/types";
 import { useTaskSelection } from "@/hooks/useTaskSelection";
 import { TaskInput } from "../forms/FormFactory";
@@ -17,7 +17,6 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   BarChart,
   Bar,
@@ -27,7 +26,12 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { TOOLTIP_STYLE, AXIS_TICK, AXIS_LABEL_STYLE, GRID_STROKE } from "../utils/chartConfig";
+import {
+  TOOLTIP_STYLE,
+  AXIS_TICK,
+  AXIS_LABEL_STYLE,
+  GRID_STROKE,
+} from "../utils/chartConfig";
 import { PALETTE } from "../utils/generateRandomColors";
 
 interface FormSelection {
@@ -92,8 +96,7 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
             <strong className="text-foreground">
               Styling Task — 120 minutes.
             </strong>{" "}
-            Pessimistic time must be greater than optimistic and most likely
-            time.
+            Pessimistic time must exceed optimistic and most likely time.
           </InfoBanner>
 
           <TaskMultiSelect
@@ -120,7 +123,7 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
                 ))}
               </div>
 
-              <div className="border-t border-border/40 pt-5">
+              <div className="border-t border-border/30 pt-5">
                 <div className="flex flex-wrap items-end gap-6">
                   <div className="space-y-2">
                     <Label>
@@ -157,15 +160,15 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
                 </div>
 
                 <div className="mt-4 flex flex-wrap items-center gap-3">
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-[13px] text-muted-foreground">
                     Optimistic:
                   </span>
                   <Badge variant="success">{optimistic}</Badge>
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-[13px] text-muted-foreground">
                     Most Likely:
                   </span>
                   <Badge variant="info">{totalMostLikelyTime}</Badge>
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-[13px] text-muted-foreground">
                     Pessimistic:
                   </span>
                   <Badge variant="destructive">{pessimistic}</Badge>
@@ -178,82 +181,82 @@ const PERTAnalysis = ({ selectedTasks, setSelectedTasks }: FormSelection) => {
         </CardContent>
       </Card>
 
-      <AnalysisCard
-        title="Estimation Analysis Result"
-        action={
-          <TaskFilter
-            tasks={tasks}
-            visibleTasks={visibleTasks}
-            onToggle={toggleVisibility}
-            onShowAll={showAllVisible}
-            onHideAll={hideAllVisible}
-          />
-        }
-      >
-        <Tabs defaultValue="table">
-          <TabsList>
-            <TabsTrigger value="chart">Distribution Chart</TabsTrigger>
-            <TabsTrigger value="table">Result Table</TabsTrigger>
-          </TabsList>
+      {/* Side-by-side: Chart + Table */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <AnalysisCard
+          title="Distribution Chart"
+          action={
+            <TaskFilter
+              tasks={tasks}
+              visibleTasks={visibleTasks}
+              onToggle={toggleVisibility}
+              onShowAll={showAllVisible}
+              onHideAll={hideAllVisible}
+            />
+          }
+          compact
+        >
+          {filteredChartData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={380}>
+              <BarChart
+                data={filteredChartData}
+                margin={{ top: 20, right: 15, bottom: 60, left: 15 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
+                <XAxis
+                  dataKey="range"
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                  tick={{ ...AXIS_TICK, fontSize: 9 }}
+                  label={{
+                    value: "Duration Range",
+                    position: "insideBottom",
+                    offset: -50,
+                    ...AXIS_LABEL_STYLE,
+                  }}
+                />
+                <YAxis
+                  tick={AXIS_TICK}
+                  label={{
+                    value: "Frequency",
+                    angle: -90,
+                    position: "insideLeft",
+                    ...AXIS_LABEL_STYLE,
+                  }}
+                />
+                <Tooltip
+                  contentStyle={TOOLTIP_STYLE}
+                  formatter={(value) => [String(value), "Simulations"]}
+                />
+                <Bar
+                  dataKey="count"
+                  fill={PALETTE[3]}
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <EmptyState
+              icon={BarChart3}
+              title="No simulation data"
+              description="Run a simulation to see the distribution"
+            />
+          )}
+        </AnalysisCard>
 
-          <TabsContent value="chart">
-            {filteredChartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={490}>
-                <BarChart
-                  data={filteredChartData}
-                  margin={{ top: 20, right: 20, bottom: 60, left: 20 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
-                  <XAxis
-                    dataKey="range"
-                    angle={-45}
-                    textAnchor="end"
-                    height={80}
-                    tick={{ ...AXIS_TICK, fontSize: 10 }}
-                    label={{
-                      value: "Duration Range",
-                      position: "insideBottom",
-                      offset: -50,
-                      ...AXIS_LABEL_STYLE,
-                    }}
-                  />
-                  <YAxis
-                    tick={AXIS_TICK}
-                    label={{
-                      value: "Frequency",
-                      angle: -90,
-                      position: "insideLeft",
-                      ...AXIS_LABEL_STYLE,
-                    }}
-                  />
-                  <Tooltip
-                    contentStyle={TOOLTIP_STYLE}
-                    formatter={(value) => [String(value), "Simulations"]}
-                  />
-                  <Bar
-                    dataKey="count"
-                    fill={PALETTE[3]}
-                    radius={[4, 4, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <EmptyState
-                icon={BarChart3}
-                title="Run a simulation to see the distribution chart"
-              />
-            )}
-          </TabsContent>
-
-          <TabsContent value="table">
-            {results !== undefined ? (
-              <MonteCarloTable result={results} />
-            ) : (
-              <EmptyState title="No results to show yet" description="Submit estimates to generate a Monte Carlo simulation" />
-            )}
-          </TabsContent>
-        </Tabs>
-      </AnalysisCard>
+        <AnalysisCard title="Result Table" compact>
+          {results !== undefined ? (
+            <MonteCarloTable result={results} />
+          ) : (
+            <EmptyState
+              icon={TableIcon}
+              title="Nothing to show yet"
+              description="Submit estimates to generate results"
+            />
+          )}
+        </AnalysisCard>
+      </div>
     </div>
   );
 };

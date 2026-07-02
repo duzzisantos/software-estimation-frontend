@@ -3,9 +3,11 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
+import { toast } from "sonner";
 
 interface GitHubUser {
   login: string;
@@ -55,10 +57,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
+  const exchangedCode = useRef<string | null>(null);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
-    if (!code) return;
+    if (!code || exchangedCode.current === code) return;
+    exchangedCode.current = code;
 
     window.history.replaceState({}, "", window.location.pathname);
 
@@ -80,9 +85,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setUnlockKeyState(data.unlock_key);
             localStorage.setItem("unlock_key", data.unlock_key);
           }
+        } else {
+          toast.error("GitHub sign-in failed. Please try again.");
         }
       } catch {
-        // backend unreachable — user stays logged out
+        toast.error("Couldn't reach the server to complete GitHub sign-in.");
       }
       setIsLoading(false);
     };
@@ -123,7 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: Boolean(apiKey),
+        isAuthenticated: Boolean(user) || Boolean(apiKey),
         isLoading,
         userName,
         loginWithGitHub,

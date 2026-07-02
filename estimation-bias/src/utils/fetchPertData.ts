@@ -4,6 +4,8 @@ interface AnalysisProperties {
   pessimistic: number;
 }
 
+import { getAuthHeaders } from "./authHeaders";
+
 const url: string = import.meta.env.VITE_API_URL_TRAINING;
 
 async function fetchPertData(postObject: AnalysisProperties) {
@@ -14,6 +16,7 @@ async function fetchPertData(postObject: AnalysisProperties) {
       headers: {
         "Content-Type": "application/json",
         Allow: "POST",
+        ...getAuthHeaders(),
       },
     });
 

@@ -7,21 +7,23 @@ import { UserProfile } from "@/components/user-profile";
 import { LoginPage } from "@/components/login-page";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { useAuth } from "@/utils/useAuth";
+import { useAuth } from "@/providers/auth-provider";
 import { Task } from "@/types";
 import PERTAnalysis from "./layout/PERT";
 import TimeSeriesAnalysis from "./layout/TimeSeries";
 import MultilinearRegression from "./layout/MultilinearRegression";
 
 function App() {
-  const { authenticated, loading, userName, login, logout } = useAuth();
+  const { isAuthenticated, isLoading, userName, logout } = useAuth();
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
   const [selectedNewTasks, setSelectedNewsTasks] = useState<Task[]>([]);
 
+  if (isLoading) return null;
+
   return (
     <ThemeProvider defaultTheme="light" storageKey="spe-ui-theme">
-      {!authenticated ? (
-        <LoginPage loading={loading} onLogin={login} />
+      {!isAuthenticated ? (
+        <LoginPage />
       ) : (
         <div className="min-h-screen bg-background">
           <header className="glass-subtle sticky top-0 z-50 w-full border-b-0">

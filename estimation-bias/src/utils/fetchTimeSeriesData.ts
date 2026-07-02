@@ -32,6 +32,8 @@ interface TaskProperties {
   submitted_by?: string | undefined;
 }
 
+import { getAuthHeaders } from "./authHeaders";
+
 const url: string = import.meta.env.VITE_API_URL_CRUD;
 
 async function createWorkLogs(postObject: TaskProperties) {
@@ -42,6 +44,7 @@ async function createWorkLogs(postObject: TaskProperties) {
       headers: {
         "Content-Type": "application/json",
         Allow: "POST",
+        ...getAuthHeaders(),
       },
     });
 

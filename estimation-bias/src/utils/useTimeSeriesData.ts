@@ -3,6 +3,7 @@ import { Task } from "@/types";
 import createWorkLogs from "./fetchTimeSeriesData";
 import { fetchDataTraining, storeDataTraining } from "./fetchDataTraining";
 import formatDate from "./formatDate";
+import { getAuthHeaders } from "./authHeaders";
 
 interface ResponseData {
   training_date: string;
@@ -23,7 +24,7 @@ export function useTimeSeriesData(
       try {
         const response = await fetch(`${url}/GetTrainedWorkLogs`, {
           method: "GET",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", ...getAuthHeaders() },
         });
         if (!response.ok) throw new Error(`${response.status}`);
         setResponseData(await response.json());

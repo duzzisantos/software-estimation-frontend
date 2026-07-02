@@ -10,12 +10,14 @@ export interface RegressionData {
   training_date: string;
 }
 
+import { getAuthHeaders } from "./authHeaders";
+
 const url: string = import.meta.env.VITE_API_URL_TRAINING;
 
 async function fetchRegressionResults(): Promise<RegressionData[]> {
   const response = await fetch(`${url}/GetRegressionResults`, {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
   });
 
   if (!response.ok) {
@@ -27,7 +29,7 @@ async function fetchRegressionResults(): Promise<RegressionData[]> {
 async function trainRegression(): Promise<{ id: string }> {
   const response = await fetch(`${url}/StoreRegressionResults`, {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
   });
 
   if (!response.ok) {

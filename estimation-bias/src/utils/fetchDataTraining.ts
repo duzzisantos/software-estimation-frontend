@@ -1,3 +1,5 @@
+import { getAuthHeaders } from "./authHeaders";
+
 const url: string = import.meta.env.VITE_API_URL_TRAINING;
 
 async function fetchDataTraining() {
@@ -7,6 +9,7 @@ async function fetchDataTraining() {
       headers: {
         "Content-Type": "application/json",
         Allow: "POST",
+        ...getAuthHeaders(),
       },
     });
 
@@ -28,6 +31,7 @@ async function storeDataTraining() {
       headers: {
         "Content-Type": "application/json",
         Allow: "GET",
+        ...getAuthHeaders(),
       },
     });
 
